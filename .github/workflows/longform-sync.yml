@@ -1,0 +1,145 @@
+name: Longform story sync
+
+on:
+  pull_request:
+    paths:
+      - 'yorugatitari/editorial/longform/*-publish.json'
+      - 'yorugatari/editorial/longform/*-publish.json'
+
+permissions:
+  contents: write
+
+jobs:
+  sync-longform:
+    if: github.head_ref == 'agent/yorugatari-longform'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out content branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref }}
+          fetch-depth: 0
+
+      - name: Publish longform drafts
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import html
+          import json
+          import re
+
+          root = Path('yorugatari')
+          config_dir = root / 'editorial' / 'longform'
+          configs = sorted(config_dir.glob('*-publish.json'))
+
+          for config_path in configs:
+              config = json.loads(config_path.read_text(encoding='utf-8'))
+              slug = config['slug']
+              minutes = int(config['minutes'])
+              length = config.get('length', '長編')
+              summary = config['summary']
+              description = config.get('description', summary)
+              explanation = config.get('explanation', '')
+              draft_path = config_dir / config['draft']
+              story_path = root / 'stories' / f'{slug}.html'
+
+              lines = draft_path.read_text(encoding='utf-8').splitlines()
+              paragraphs = []
+              for line in lines:
+                  text = line.strip()
+                  if not text or text.startswith('# '):
+                      continue
+                  paragraphs.append(f'<p>{html.escape(text, quote=False)}</p>')
+
+              article = ''.join(paragraphs)
+              if explanation:
+                  article += (
+                      '<button class="btn" id="explainBtn">解説を見る</button>'
+                      '<div class="explanation" id="explanation"><strong>解説</strong>'
+                      f'<p>{html.escape(explanation, quote=False)}</p></div>'
+                  )
+              article += '<p class="notice">この作品はフィクションです。AIを制作補助に使用し、編集工程を経て掲載しています。</p>'
+
+              page = story_path.read_text(encoding='utf-8')
+              old_description_match = re.search(r'<meta name="description" content="([^"]*)">', page)
+              if not old_description_match:
+                  raise SystemExit(f'meta description not found: {story_path}')
+              old_description = old_description_match.group(1)
+              page = page.replace(old_description, description)
+              page = re.sub(
+                  r'(<div class="meta"><span class="badge">[^<]+</span>)<span>[^<]+</span><span>約\d+分</span>',
+                  rf'\1<span>{length}</span><span>約{minutes}分</span>',
+                  page,
+                  count=1,
+              )
+              page = re.sub(
+                  r'(<p class="section-note">).*?(</p>)',
+                  lambda match: match.group(1) + html.escape(summary, quote=False) + match.group(2),
+                  page,
+                  count=1,
+                  flags=re.S,
+              )
+              page, replacements = re.subn(
+                  r'(<article class="story-body">).*?(</article>)',
+                  lambda match: match.group(1) + article + match.group(2),
+                  page,
+                  count=1,
+                  flags=re.S,
+              )
+              if replacements != 1:
+                  raise SystemExit(f'article replacement failed: {story_path}')
+              story_path.write_text(page, encoding='utf-8')
+
+              stories_path = root / 'assets' / 'stories.js'
+              stories_text = stories_path.read_text(encoding='utf-8')
+              prefix = 'window.STORIES = '
+              if not stories_text.startswith(prefix) or not stories_text.rstrip().endswith(';'):
+                  raise SystemExit('stories.js format is unexpected')
+              data = json.loads(stories_text[len(prefix):].rstrip()[:-1])
+              target = next((story for story in data if story.get('slug') == slug), None)
+              if target is None:
+                  raise SystemExit(f'story data not found: {slug}')
+              target['length'] = length
+              target['minutes'] = minutes
+              target['summary'] = summary
+              stories_path.write_text(prefix + json.dumps(data, ensure_ascii=False, indent=2) + ';\n', encoding='utf-8')
+
+              story_js_path = root / 'assets' / 'story.js'
+              story_js = story_js_path.read_text(encoding='utf-8')
+              story_js, count = re.subn(
+                  rf"('{re.escape(slug)}':\s*)\d+",
+                  rf'\g<1>{minutes}',
+                  story_js,
+                  count=1,
+              )
+              if count != 1:
+                  raise SystemExit(f'reading time not found: {slug}')
+              story_js_path.write_text(story_js, encoding='utf-8')
+
+              config_path.unlink()
+
+          if not configs:
+              print('No publish configurations found.')
+          PY
+
+      - name: Validate generated files
+        shell: bash
+        run: |
+          node --check yorugatari/assets/stories.js
+          node --check yorugatari/assets/story.js
+          grep -F '約8分' yorugatari/stories/last-elevator.html
+          grep -F '"minutes": 8' yorugatari/assets/stories.js
+
+      - name: Commit generated content
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add yorugatari
+          if git diff --cached --quiet; then
+            echo "No generated changes."
+            exit 0
+          fi
+          git commit -m "Publish longform story content"
+          git push origin HEAD:${{ github.head_ref }}
