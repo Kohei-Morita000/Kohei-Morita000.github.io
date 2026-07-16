@@ -1,0 +1,30 @@
+---
+const policyLinks = [
+  { href: "/about/", label: "このサイトについて" },
+  { href: "/submission-guidelines/", label: "投稿ガイドライン" },
+  { href: "/copyright/", label: "著作権ポリシー" },
+  { href: "/terms/", label: "利用規約" },
+  { href: "/privacy/", label: "プライバシー" },
+  { href: "/contact/", label: "お問い合わせ" },
+];
+---
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div>
+      <p class="footer-title">闇語り文庫</p>
+      <p class="footer-copy">
+        怪談を、恐怖の種類・舞台・長さ・結末から探せる静的アーカイブです。無断転載を避け、掲載状態と権利確認を管理します。
+      </p>
+    </div>
+    <nav aria-label="サイト情報">
+      {
+        policyLinks.map((link) => (
+          <a href={link.href}>{link.label}</a>
+        ))
+      }
+      <a href="/rss.xml">RSS</a>
+      <a href="/sitemap-index.xml">サイトマップ</a>
+    </nav>
+  </div>
+</footer>

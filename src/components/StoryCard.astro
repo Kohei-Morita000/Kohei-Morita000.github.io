@@ -1,0 +1,33 @@
+---
+import type { Story } from "@lib/stories";
+import { storyPath } from "@lib/stories";
+import { formatDate } from "@lib/date";
+
+const { story, compact = false } = Astro.props as { story: Story; compact?: boolean };
+---
+
+<article class:list={["story-card", compact && "is-compact"]} data-story-id={story.data.id}>
+  <a href={storyPath(story)} class="story-card-link">
+    <span class="story-card-category">{story.data.mainCategory}</span>
+    <h3>{story.data.title}</h3>
+    <p>{story.data.excerpt}</p>
+    <dl class="story-meta">
+      <div>
+        <dt>恐怖</dt>
+        <dd>Lv.{story.data.fearLevel}</dd>
+      </div>
+      <div>
+        <dt>長さ</dt>
+        <dd>{story.data.lengthType}</dd>
+      </div>
+      <div>
+        <dt>読了</dt>
+        <dd>{story.data.estimatedReadingMinutes}分</dd>
+      </div>
+      <div>
+        <dt>公開</dt>
+        <dd>{formatDate(story.data.publishedAt)}</dd>
+      </div>
+    </dl>
+  </a>
+</article>

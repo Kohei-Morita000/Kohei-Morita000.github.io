@@ -1,0 +1,81 @@
+---
+import Header from "@components/Header.astro";
+import Footer from "@components/Footer.astro";
+import { absoluteUrl, siteConfig } from "../config/site";
+import "../styles/global.css";
+
+type Props = {
+  title?: string;
+  description?: string;
+  canonical?: string;
+  image?: string;
+  noindex?: boolean;
+  bodyClass?: string;
+  jsonLd?: Record<string, unknown> | Record<string, unknown>[];
+};
+
+const {
+  title,
+  description = siteConfig.description,
+  canonical = Astro.url.pathname,
+  image = siteConfig.defaultOgImage,
+  noindex = false,
+  bodyClass = "",
+  jsonLd,
+} = Astro.props;
+
+const pageTitle = title ? `${title} | ${siteConfig.name}` : siteConfig.name;
+const canonicalUrl = absoluteUrl(canonical);
+const imageUrl = absoluteUrl(image);
+---
+
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="generator" content={Astro.generator} />
+    <title>{pageTitle}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonicalUrl} />
+    {noindex && <meta name="robots" content="noindex,follow" />}
+    <meta property="og:site_name" content={siteConfig.name} />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={pageTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonicalUrl} />
+    <meta property="og:image" content={imageUrl} />
+    <meta property="og:locale" content={siteConfig.locale} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={pageTitle} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={imageUrl} />
+    <meta name="theme-color" content="#11100f" />
+    <link rel="alternate" type="application/rss+xml" title={`${siteConfig.name} RSS`} href={absoluteUrl("/rss.xml")} />
+    {
+      jsonLd && (
+        <script type="application/ld+json" set:html={JSON.stringify(jsonLd).replaceAll("</", "<\\/")} />
+      )
+    }
+  </head>
+  <body class={bodyClass}>
+    <script is:inline>
+      (() => {
+        try {
+          const settings = JSON.parse(localStorage.getItem("kaidan-reader-settings") || "{}");
+          const root = document.documentElement;
+          if (settings.theme) root.dataset.theme = settings.theme;
+          if (settings.fontSize) root.style.setProperty("--reader-font-scale", settings.fontSize);
+          if (settings.lineHeight) root.style.setProperty("--reader-line-height", settings.lineHeight);
+          if (settings.width) root.style.setProperty("--reader-width", settings.width);
+        } catch {}
+      })();
+    </script>
+    <a class="skip-link" href="#main-content">本文へ移動</a>
+    <Header />
+    <main id="main-content">
+      <slot />
+    </main>
+    <Footer />
+  </body>
+</html>

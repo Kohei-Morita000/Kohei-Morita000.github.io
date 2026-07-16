@@ -1,0 +1,31 @@
+---
+const navItems = [
+  { href: "/stories/", label: "作品一覧" },
+  { href: "/categories/", label: "カテゴリ" },
+  { href: "/search/", label: "検索" },
+  { href: "/random/", label: "ランダム" },
+  { href: "/favorites/", label: "お気に入り" },
+  { href: "/history/", label: "履歴" },
+];
+---
+
+<header class="site-header">
+  <div class="header-inner">
+    <a class="brand" href="/" aria-label="闇語り文庫 トップへ">
+      <span class="brand-mark" aria-hidden="true">灯</span>
+      <span>
+        <strong>闇語り文庫</strong>
+        <small>怪談データベース</small>
+      </span>
+    </a>
+    <nav class="primary-nav" aria-label="主要ナビゲーション">
+      {
+        navItems.map((item) => (
+          <a href={item.href} class={Astro.url.pathname.startsWith(item.href) ? "is-active" : ""}>
+            {item.label}
+          </a>
+        ))
+      }
+    </nav>
+  </div>
+</header>

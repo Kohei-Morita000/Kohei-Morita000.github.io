@@ -1,0 +1,8 @@
+---
+const { position, label = "広告枠" } = Astro.props as { position: string; label?: string };
+---
+
+<aside class="ad-slot" data-position={position} aria-label={label}>
+  <span>{label}</span>
+  <small>将来の広告・書籍紹介・朗読案内用スペース</small>
+</aside>
