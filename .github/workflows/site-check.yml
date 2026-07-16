@@ -1,0 +1,32 @@
+name: Site availability check
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  check-site:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check candidate GitHub Pages URLs
+        shell: bash
+        run: |
+          set -u
+          urls=(
+            "https://kohei-morita000.github.io/yorugatari/"
+            "https://allsunday1122.github.io/Kohei-Morita000.github.io/yorugatari/"
+            "https://allsunday1122.github.io/yorugatari/"
+          )
+
+          for url in "${urls[@]}"; do
+            echo "=== $url ==="
+            status=$(curl -L -sS -o page.html -w '%{http_code}' --max-time 30 "$url" || true)
+            final=$(curl -L -sS -o /dev/null -w '%{url_effective}' --max-time 30 "$url" || true)
+            title=$(sed -n 's:.*<title>\([^<]*\)</title>.*:\1:p' page.html | head -n 1 || true)
+            echo "HTTP_STATUS=$status"
+            echo "FINAL_URL=$final"
+            echo "TITLE=$title"
+          done
