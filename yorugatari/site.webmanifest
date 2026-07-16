@@ -1,0 +1,9 @@
+{
+  "name": "夜語り",
+  "short_name": "夜語り",
+  "start_url": "/yorugatari/",
+  "scope": "/yorugatari/",
+  "display": "standalone",
+  "background_color": "#090b10",
+  "theme_color": "#090b10"
+}
