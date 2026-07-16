@@ -1,5 +1,20 @@
 document.documentElement.classList.add('js');
 
+const readingMinutes = {
+  'last-elevator': 2,
+  'neighbor-wifi': 2,
+  'kind-manager': 2,
+  'family-photo': 2,
+  'three-knocks': 2,
+  'read-receipt': 1,
+  'night-bus': 2,
+  'delivery-box': 2,
+  'voice-memo': 2,
+  'missing-floor': 2,
+  'good-night': 2,
+  'window-reflection': 1
+};
+
 const progress = document.querySelector('.progress');
 addEventListener('scroll', function () {
   const documentElement = document.documentElement;
@@ -7,8 +22,37 @@ addEventListener('scroll', function () {
   if (progress) progress.style.width = (max ? documentElement.scrollTop / max * 100 : 0) + '%';
 }, { passive: true });
 
+const slug = document.body.dataset.slug;
+const currentMinutes = readingMinutes[slug];
+const headerMeta = document.querySelectorAll('.story-hero .meta span');
+if (currentMinutes && headerMeta.length) {
+  headerMeta[headerMeta.length - 1].textContent = '約' + currentMinutes + '分';
+}
+
+document.querySelectorAll('.rank-item').forEach(function (item) {
+  const href = item.getAttribute('href') || '';
+  const relatedSlug = href.replace(/^.*\//, '').replace(/\.html(?:#.*)?$/, '');
+  const minutes = readingMinutes[relatedSlug];
+  const detail = item.querySelector('small');
+  if (minutes && detail) detail.textContent = detail.textContent.replace(/約\d+分/, '約' + minutes + '分');
+});
+
+const mainNav = document.querySelector('.site-header .nav');
+if (mainNav) {
+  mainNav.setAttribute('aria-label', '主要メニュー');
+  const rankingLink = mainNav.querySelector('a[href*="#ranking"]');
+  if (rankingLink) rankingLink.textContent = 'おすすめ';
+}
+
+const fear = document.querySelector('.story-side .fear');
+if (fear) {
+  const fearLevel = (fear.textContent.match(/●/g) || []).length;
+  fear.setAttribute('aria-label', '怖さ ' + fearLevel + '/5');
+}
+
 const explanationButton = document.querySelector('#explainBtn');
 const explanation = document.querySelector('#explanation');
+if (explanationButton) explanationButton.setAttribute('type', 'button');
 if (explanationButton && explanation) {
   if (!explanation.id) explanation.id = 'explanation';
   explanationButton.setAttribute('aria-controls', explanation.id);
@@ -21,7 +65,7 @@ if (explanationButton && explanation) {
 }
 
 const favoriteButton = document.querySelector('#favoriteBtn');
-const slug = document.body.dataset.slug;
+if (favoriteButton) favoriteButton.setAttribute('type', 'button');
 const storageKey = 'yorugatari-favorites';
 let favorites = [];
 try {
@@ -49,6 +93,7 @@ if (favoriteButton) {
 drawFavorite();
 
 const shareButton = document.querySelector('#shareBtn');
+if (shareButton) shareButton.setAttribute('type', 'button');
 if (shareButton) {
   shareButton.addEventListener('click', async function () {
     const description = document.querySelector('meta[name="description"]');
