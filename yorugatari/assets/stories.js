@@ -17,10 +17,10 @@ window.STORIES = [
     "slug": "neighbor-wifi",
     "title": "隣人のWi-Fi",
     "category": "ネット怪談",
-    "length": "短編",
+    "length": "長編",
     "fear": 3,
-    "minutes": 2,
-    "summary": "引っ越した夜、スマートフォンに現れた奇妙なWi-Fi名。翌朝、その意味を知る。",
+    "minutes": 8,
+    "summary": "相場より安い301号室へ越した美月は、存在しない302号室を名乗るWi-Fiから警告を受け取る。壁の向こうに隠されていたのは、消された部屋と歴代住人の監視記録だった。",
     "tags": [
       "Wi-Fi",
       "一人暮らし",
