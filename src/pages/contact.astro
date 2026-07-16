@@ -1,0 +1,27 @@
+---
+import BaseLayout from "@layouts/BaseLayout.astro";
+import Breadcrumbs from "@components/Breadcrumbs.astro";
+import { siteConfig } from "../config/site";
+---
+
+<BaseLayout title="お問い合わせ" description="削除依頼、権利確認、掲載相談、サイト不具合の連絡先です。" noindex>
+  <Breadcrumbs items={[{ href: "/contact/", label: "お問い合わせ" }]} />
+  <section class="hero">
+    <div class="container">
+      <p class="eyebrow">Contact</p>
+      <h1>お問い合わせ</h1>
+      <p>削除依頼、権利確認、掲載相談、サイト不具合はこちらから連絡してください。</p>
+    </div>
+  </section>
+  <section class="prose">
+    <h2>連絡先</h2>
+    <p><a href={`mailto:${siteConfig.contactEmail}`}>{siteConfig.contactEmail}</a></p>
+    <h2>削除依頼に必要な情報</h2>
+    <ul>
+      <li>対象ページのURL</li>
+      <li>問題箇所</li>
+      <li>権利者本人または代理人であることが分かる情報</li>
+      <li>希望する対応内容</li>
+    </ul>
+  </section>
+</BaseLayout>

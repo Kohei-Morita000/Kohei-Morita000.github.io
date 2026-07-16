@@ -1,0 +1,23 @@
+---
+import BaseLayout from "@layouts/BaseLayout.astro";
+import Breadcrumbs from "@components/Breadcrumbs.astro";
+---
+
+<BaseLayout title="プライバシーポリシー" description="闇語り文庫のプライバシー方針と端末内保存データの扱いです。">
+  <Breadcrumbs items={[{ href: "/privacy/", label: "プライバシー" }]} />
+  <section class="hero">
+    <div class="container">
+      <p class="eyebrow">Privacy</p>
+      <h1>プライバシーポリシー</h1>
+      <p>このページはMVP時点の方針です。解析や広告を導入する場合は、利用サービスと取得項目を追記します。</p>
+    </div>
+  </section>
+  <section class="prose">
+    <h2>端末内保存</h2>
+    <p>お気に入り、読書履歴、表示設定はブラウザのlocalStorageに保存されます。これらはサイト運営者のサーバーへ送信されません。</p>
+    <h2>アクセス解析と広告</h2>
+    <p>現時点で実広告IDや解析IDはコードに固定していません。導入時は、利用する外部サービス、Cookie等の利用、オプトアウト方法を明記します。</p>
+    <h2>お問い合わせ</h2>
+    <p>削除依頼や権利に関する連絡では、確認に必要な範囲で連絡先と対象URLを受け取る場合があります。</p>
+  </section>
+</BaseLayout>

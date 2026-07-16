@@ -1,0 +1,28 @@
+---
+import BaseLayout from "@layouts/BaseLayout.astro";
+import Breadcrumbs from "@components/Breadcrumbs.astro";
+---
+
+<BaseLayout title="利用規約" description="闇語り文庫の閲覧、投稿、二次利用に関する基本条件です。">
+  <Breadcrumbs items={[{ href: "/terms/", label: "利用規約" }]} />
+  <section class="hero">
+    <div class="container">
+      <p class="eyebrow">Terms</p>
+      <h1>利用規約</h1>
+      <p>本サイトの閲覧と将来の投稿機能に関する基本条件です。</p>
+    </div>
+  </section>
+  <section class="prose">
+    <h2>閲覧について</h2>
+    <p>作品には恐怖、不安、喪失、医療現場、家庭内不和などの表現が含まれる場合があります。コンテンツ警告を確認し、無理のない範囲で閲覧してください。</p>
+    <h2>禁止事項</h2>
+    <ul>
+      <li>本文、分類文、画像等の無断転載</li>
+      <li>サイト運営や閲覧を妨げる行為</li>
+      <li>実在人物や団体への誹謗中傷の投稿</li>
+      <li>犯罪予告、危険行為、個人情報の投稿</li>
+    </ul>
+    <h2>投稿機能について</h2>
+    <p>投稿機能を実装する場合、投稿者は自分が権利を持つ作品のみ投稿できます。掲載後も、権利侵害や規約違反が判明した場合は削除対象になります。</p>
+  </section>
+</BaseLayout>

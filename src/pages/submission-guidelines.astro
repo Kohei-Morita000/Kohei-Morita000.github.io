@@ -1,0 +1,33 @@
+---
+import BaseLayout from "@layouts/BaseLayout.astro";
+import Breadcrumbs from "@components/Breadcrumbs.astro";
+---
+
+<BaseLayout title="投稿ガイドライン" description="将来の投稿機能に向けた、怖い話の投稿条件と禁止事項です。">
+  <Breadcrumbs items={[{ href: "/submission-guidelines/", label: "投稿ガイドライン" }]} />
+  <section class="hero">
+    <div class="container">
+      <p class="eyebrow">Guidelines</p>
+      <h1>投稿ガイドライン</h1>
+      <p>現段階で投稿フォームはありませんが、将来の投稿受付に備えて掲載条件を明記します。</p>
+    </div>
+  </section>
+  <section class="prose">
+    <h2>投稿できる作品</h2>
+    <ul>
+      <li>投稿者本人が権利を持つオリジナル作品</li>
+      <li>第三者の権利を侵害しない体験談または創作怪談</li>
+      <li>AI支援を使った場合、その事実を申告した作品</li>
+    </ul>
+    <h2>禁止事項</h2>
+    <ul>
+      <li>他サイト、書籍、動画、SNS投稿からの無断転載</li>
+      <li>有名怪談の固有名詞だけを変更した作品</li>
+      <li>実在人物への誹謗中傷、個人情報の掲載</li>
+      <li>犯罪予告、危険行為の助長、差別的表現</li>
+      <li>投稿者が権利を持たない画像、音声、文章の添付</li>
+    </ul>
+    <h2>掲載条件</h2>
+    <p>投稿作品は編集部確認後に掲載可否を判断します。必要に応じて表記調整、分類付与、コンテンツ警告の追加、掲載見送りを行います。</p>
+  </section>
+</BaseLayout>

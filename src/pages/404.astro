@@ -1,0 +1,18 @@
+---
+import BaseLayout from "@layouts/BaseLayout.astro";
+---
+
+<BaseLayout title="ページが見つかりません" description="指定されたページは見つかりませんでした。" noindex>
+  <section class="hero">
+    <div class="container">
+      <p class="eyebrow">404</p>
+      <h1>ページが見つかりません</h1>
+      <p>URLが変更されたか、ページが削除された可能性があります。作品一覧や検索から探してください。</p>
+      <div class="button-row">
+        <a class="button" href="/search/">検索する</a>
+        <a class="ghost-button" href="/stories/">作品一覧へ</a>
+        <a class="ghost-button" href="/">トップへ戻る</a>
+      </div>
+    </div>
+  </section>
+</BaseLayout>

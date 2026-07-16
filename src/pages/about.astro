@@ -1,0 +1,24 @@
+---
+import BaseLayout from "@layouts/BaseLayout.astro";
+import Breadcrumbs from "@components/Breadcrumbs.astro";
+---
+
+<BaseLayout title="このサイトについて" description="闇語り文庫の運営方針、分類方針、AI支援コンテンツの扱いを説明します。">
+  <Breadcrumbs items={[{ href: "/about/", label: "このサイトについて" }]} />
+  <section class="hero">
+    <div class="container">
+      <p class="eyebrow">About</p>
+      <h1>このサイトについて</h1>
+      <p>闇語り文庫は、怖い話を分類・検索・回遊しやすい形で蓄積する怪談ライブラリーです。</p>
+    </div>
+  </section>
+  <section class="prose">
+    <h2>運営方針</h2>
+    <p>更新順のブログではなく、恐怖の種類、舞台、長さ、結末、シリーズで探せる静的アーカイブとして設計しています。</p>
+    <p>作品は権利状態、AI支援の有無、レビュー状態をメタデータとして管理します。AI支援を使った作品も、無断転載や既存作品の言い換えではなく、独自作品として確認してから掲載します。</p>
+    <h2>読者機能</h2>
+    <p>お気に入り、読書履歴、表示設定はブラウザ内に保存されます。サーバーへ送信されず、別端末とは共有されません。</p>
+    <h2>安全性</h2>
+    <p>自動再生音声、ジャンプスケア、偽警告、戻る操作を妨害する挙動は実装しません。強い表現がある場合は作品ページでコンテンツ警告を表示します。</p>
+  </section>
+</BaseLayout>

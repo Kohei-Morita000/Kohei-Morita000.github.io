@@ -1,0 +1,25 @@
+---
+import BaseLayout from "@layouts/BaseLayout.astro";
+import Breadcrumbs from "@components/Breadcrumbs.astro";
+---
+
+<BaseLayout title="著作権ポリシー" description="無断転載禁止、朗読・動画化・商用利用、削除依頼の方針です。">
+  <Breadcrumbs items={[{ href: "/copyright/", label: "著作権ポリシー" }]} />
+  <section class="hero">
+    <div class="container">
+      <p class="eyebrow">Copyright</p>
+      <h1>著作権ポリシー</h1>
+      <p>作品とサイト内テキストの権利、削除依頼、二次利用の方針です。</p>
+    </div>
+  </section>
+  <section class="prose">
+    <h2>無断転載の禁止</h2>
+    <p>本サイトの作品本文、分類説明、ページ構成文の無断転載を禁止します。引用する場合は、必要最小限の範囲で出典URLを明記してください。</p>
+    <h2>朗読、動画化、商用利用</h2>
+    <p>公開作品の朗読、動画化、配信、商用利用を希望する場合は、事前にお問い合わせください。作品ごとに許諾可否と条件を確認します。</p>
+    <h2>AI支援作品</h2>
+    <p>AI支援を使った作品はメタデータで管理し、既存作品の要約、翻案、言い換えにならないよう確認します。</p>
+    <h2>削除依頼</h2>
+    <p>権利侵害、個人情報、実在人物への不利益が疑われる場合は、対象URL、問題箇所、権利関係を添えてお問い合わせください。確認後、修正または削除を検討します。</p>
+  </section>
+</BaseLayout>
