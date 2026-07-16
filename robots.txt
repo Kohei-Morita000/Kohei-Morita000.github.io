@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://kohei-morita000.github.io/yorugatari/sitemap.xml
