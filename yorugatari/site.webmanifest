@@ -1,11 +1,11 @@
 {
-  "id": "/yorugatari/",
+  "id": "/Kohei-Morita000.github.io/yorugatari/",
   "name": "夜語り｜オリジナル怖い話",
   "short_name": "夜語り",
   "description": "3分で読めるオリジナル短編ホラーサイト",
   "lang": "ja",
-  "start_url": "/yorugatari/",
-  "scope": "/yorugatari/",
+  "start_url": "/Kohei-Morita000.github.io/yorugatari/",
+  "scope": "/Kohei-Morita000.github.io/yorugatari/",
   "display": "standalone",
   "background_color": "#090b10",
   "theme_color": "#090b10"
