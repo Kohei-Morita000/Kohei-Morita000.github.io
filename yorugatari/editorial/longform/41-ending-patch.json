@@ -1,0 +1,41 @@
+{
+  "operations": [
+    {
+      "path": "yorugatari/editorial/longform/02-neighbor-wifi-draft.md",
+      "mode": "tail",
+      "start": "新しい部屋へ移って一週間後、固定回線の設定をした。",
+      "replacement": "刑事は確認のため、押収したルーターと古いスマートフォンを取調室の机へ運んだ。\n\nどちらも透明な証拠袋に入っていた。\n\nルーターには電池がなく、端子にも何もつながっていない。\n\nスマートフォンの画面は黒いままだった。\n\n刑事が自分の端末で周囲のWi-Fi一覧を開いた。\n\n見覚えのないネットワークが、一覧の最上段に表示された。\n\n「301_たすけて」\n\n刑事が顔を上げた。\n\n「署内の機器ではありません」\n\n私は接続しなかった。\n\nそれでも、自分のスマートフォンへ通知が届いた。\n\n〈今度は、証拠を消さないで〉\n\n刑事が証拠袋へ手を伸ばした瞬間、取調室の白い壁から、コン、コン、コン、と三回ノックされた。"
+    },
+    {
+      "path": "yorugatari/editorial/longform/06-read-receipt-draft.md",
+      "mode": "tail",
+      "start": "私は勤務先へ事情を伝え、別の区にある短期賃貸へ移った。",
+      "replacement": "理恵のスマートフォンは証拠袋へ入れられた。\n\n警察官が物置、寝室、浴室をもう一度確認する間、私は杉原さんと廊下で待った。\n\n室内には誰もいないという報告が、無線で繰り返された。\n\nそのとき、私のスマートフォンの画面が光った。\n\n理恵との会話欄に、新しい文章が届いていた。\n\n〈いま帰った〉\n\n続けて位置情報が送られた。\n\n地図の印は、警察官が捜索している私の部屋の上にあった。\n\n「端末はここにあります」\n\n杉原さんは証拠袋を持ち上げた。\n\n中のスマートフォンは黒いままだった。\n\n私の手の中で、二音の通知音が鳴った。\n\n開いた玄関の向こう、寝室の戸の奥で、それまで続いていたごく小さな衣擦れが止まった。\n\n画面には、最後の文章が表示されていた。\n\n「また送ってね。音が鳴ると、あなたがどの部屋にいるか分かるから」"
+    },
+    {
+      "path": "yorugatari/editorial/longform/07-night-bus-draft.md",
+      "mode": "tail",
+      "start": "私はその紙を封筒へ入れ、二度と深夜バスへ乗らなかった。",
+      "replacement": "年配の職員が乗車券を透明な袋へ入れようとした。\n\nその前で、裏面の文字が水を吸ったようににじんだ。\n\n〈大庭裕也　交代待ち〉\n\n最後の二文字が薄れ、別の文字へ変わった。\n\n〈大庭裕也　乗務開始〉\n\n営業所の壁にある発車案内板が点灯した。\n\n廃止された路線番号と、午前零時四十七分という時刻が表示された。\n\n外の車庫には、バスが一台も停まっていない。\n\nそれでも構内の奥から、古いディーゼルエンジンが始動する音がした。\n\n職員が放送設備の電源を切った。\n\nスピーカーの表示は消えた。\n\n無音になったはずの天井から、私自身の声が流れた。\n\n「乗務員交代のため、発車します」"
+    },
+    {
+      "path": "yorugatari/editorial/longform/04-family-photo-draft.md",
+      "mode": "replace",
+      "old": "私は、ようやく祖母の役目を終わらせられたと思った。",
+      "new": "写真の中へ全員が戻り、祖母が続けてきた空席は不要になったはずだった。"
+    },
+    {
+      "path": "yorugatari/editorial/longform/05-three-knocks-draft.md",
+      "mode": "replace",
+      "old": "これで終わったのだと思った。",
+      "new": "翌朝の名簿だけを見れば、交換は解消されたように見えた。"
+    }
+  ],
+  "sync": [
+    {"slug": "neighbor-wifi", "draft": "02-neighbor-wifi-draft.md"},
+    {"slug": "family-photo", "draft": "04-family-photo-draft.md"},
+    {"slug": "three-knocks", "draft": "05-three-knocks-draft.md"},
+    {"slug": "read-receipt", "draft": "06-read-receipt-draft.md"},
+    {"slug": "night-bus", "draft": "07-night-bus-draft.md"}
+  ]
+}
