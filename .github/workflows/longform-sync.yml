@@ -96,6 +96,10 @@ jobs:
 
           for config_path in configs:
               config = json.loads(config_path.read_text(encoding='utf-8'))
+              if config.get('trigger_only'):
+                  config_path.unlink()
+                  continue
+
               slug = config['slug']
               minutes = int(config['minutes'])
               length = config.get('length', '長編')
