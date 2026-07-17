@@ -7,7 +7,7 @@ const readingMinutes = {
   'family-photo': 8,
   'three-knocks': 8,
   'read-receipt': 8,
-  'night-bus': 2,
+  'night-bus': 8,
   'delivery-box': 2,
   'voice-memo': 2,
   'missing-floor': 2,
