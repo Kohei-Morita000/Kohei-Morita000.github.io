@@ -1,0 +1,58 @@
+name: Patch MKB-007 listing
+
+on:
+  push:
+    paths:
+      - .github/workflows/patch-mkb007.yml
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Patch index and sitemap
+        shell: python
+        run: |
+          from pathlib import Path
+          index_path = Path('index.html')
+          sitemap_path = Path('sitemap.xml')
+          index = index_path.read_text(encoding='utf-8')
+          sitemap = sitemap_path.read_text(encoding='utf-8')
+          story_path = '/kyokai-yawa/stories/mkb-007-onsei-annai-wa-nido-magaru.html'
+          story_url = 'https://allsunday1122.github.io' + story_path
+
+          if story_path not in index:
+              card = '''      <a class="work-card" href="/kyokai-yawa/stories/mkb-007-onsei-annai-wa-nido-magaru.html"><div><span class="id">MKB-007 · 真壁夜話</span><h3>音声案内は二度曲がる</h3><p>同じ青柱42を二度右折するよう案内され、存在しない中間区画の経路を完了するまで出口処理が終わらない。</p></div><div class="work-meta"><span class="tag">短編</span><span class="tag">約6分</span><span class="tag">恐怖 3</span></div></a>\n'''
+              marker = '      <a class="work-card" href="/kyokai-yawa/stories/mkb-008-mujin-reji-no-miseisansha.html">'
+              if marker not in index: raise SystemExit('MKB-008 card marker not found')
+              index = index.replace(marker, card + marker, 1)
+              old = '<article class="series-card" id="series-makabe"><div class="series-card-head"><div class="series-title-row"><h3>真壁夜話</h3><span class="series-count">7話公開</span>'
+              new = '<article class="series-card" id="series-makabe"><div class="series-card-head"><div class="series-title-row"><h3>真壁夜話</h3><span class="series-count">8話公開</span>'
+              if old not in index: raise SystemExit('Makabe count marker not found')
+              index = index.replace(old, new, 1)
+              list_marker = '<li><a class="story-link" href="/kyokai-yawa/stories/mkb-008-mujin-reji-no-miseisansha.html">'
+              item = '<li><a class="story-link" href="/kyokai-yawa/stories/mkb-007-onsei-annai-wa-nido-magaru.html"><span class="story-id">MKB-007</span><span class="story-title">音声案内は二度曲がる</span><span class="story-arrow">›</span></a></li>'
+              if list_marker not in index: raise SystemExit('MKB-008 list marker not found')
+              index = index.replace(list_marker, item + list_marker, 1)
+              index_path.write_text(index, encoding='utf-8')
+
+          if story_url not in sitemap:
+              marker = '  <url><loc>https://allsunday1122.github.io/kyokai-yawa/stories/mkb-008-mujin-reji-no-miseisansha.html</loc>'
+              item = '  <url><loc>' + story_url + '</loc><lastmod>2026-07-18</lastmod></url>\n'
+              if marker not in sitemap: raise SystemExit('MKB-008 sitemap marker not found')
+              sitemap = sitemap.replace(marker, item + marker, 1)
+              sitemap_path.write_text(sitemap, encoding='utf-8')
+
+          Path('.github/workflows/patch-mkb007.yml').unlink(missing_ok=True)
+      - name: Commit changes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html sitemap.xml .github/workflows/patch-mkb007.yml
+          git commit -m "List MKB-007 on archive" || exit 0
+          git push
