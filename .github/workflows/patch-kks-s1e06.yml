@@ -1,0 +1,66 @@
+name: Patch KKS-S1E06 listing
+
+on:
+  push:
+    paths:
+      - .github/workflows/patch-kks-s1e06.yml
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Patch index and sitemap
+        shell: python
+        run: |
+          from pathlib import Path
+
+          index_path = Path("index.html")
+          sitemap_path = Path("sitemap.xml")
+          index = index_path.read_text(encoding="utf-8")
+          sitemap = sitemap_path.read_text(encoding="utf-8")
+
+          story_path = "/kyokai-yawa/stories/kks-s1e06-nijumaru-no-hyoshiki.html"
+          story_url = "https://allsunday1122.github.io" + story_path
+
+          if story_path not in index:
+              card = '''      <a class="work-card" href="/kyokai-yawa/stories/kks-s1e06-nijumaru-no-hyoshiki.html"><div><span class="id">KKS-S1E06 · 境界観測記</span><h3>二重丸の標識</h3><p>旧境界標識の欠けた二重丸を見た者だけが、道路の内外分類を反転させる。複数視点と絶対方位で撤去を試みる。</p></div><div class="work-meta"><span class="tag">長編</span><span class="tag">約14分</span><span class="tag">恐怖 4</span></div></a>\n'''
+              marker = '      <a class="work-card" href="/kyokai-yawa/stories/kks-s1e08-kyu-kansokuto-no-kagi.html">'
+              if marker not in index:
+                  raise SystemExit("KKS-S1E08 card marker not found")
+              index = index.replace(marker, card + marker, 1)
+
+              series_old = '<article class="series-card" id="series-kansoku"><div class="series-card-head"><div class="series-title-row"><h3>境界観測記</h3><span class="series-count">6話公開</span>'
+              series_new = '<article class="series-card" id="series-kansoku"><div class="series-card-head"><div class="series-title-row"><h3>境界観測記</h3><span class="series-count">7話公開</span>'
+              if series_old not in index:
+                  raise SystemExit("Kansoku series count marker not found")
+              index = index.replace(series_old, series_new, 1)
+
+              list_marker = '<li><a class="story-link" href="/kyokai-yawa/stories/kks-s1e08-kyu-kansokuto-no-kagi.html">'
+              list_item = '<li><a class="story-link" href="/kyokai-yawa/stories/kks-s1e06-nijumaru-no-hyoshiki.html"><span class="story-id">KKS-S1E06</span><span class="story-title">二重丸の標識</span><span class="story-arrow">›</span></a></li>'
+              if list_marker not in index:
+                  raise SystemExit("KKS-S1E08 list marker not found")
+              index = index.replace(list_marker, list_item + list_marker, 1)
+              index_path.write_text(index, encoding="utf-8")
+
+          if story_url not in sitemap:
+              marker = '  <url><loc>https://allsunday1122.github.io/kyokai-yawa/stories/kks-s1e08-kyu-kansokuto-no-kagi.html</loc>'
+              item = '  <url><loc>' + story_url + '</loc><lastmod>2026-07-18</lastmod></url>\n'
+              if marker not in sitemap:
+                  raise SystemExit("KKS-S1E08 sitemap marker not found")
+              sitemap = sitemap.replace(marker, item + marker, 1)
+              sitemap_path.write_text(sitemap, encoding="utf-8")
+
+          Path(".github/workflows/patch-kks-s1e06.yml").unlink(missing_ok=True)
+      - name: Commit changes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html sitemap.xml .github/workflows/patch-kks-s1e06.yml
+          git commit -m "List KKS-S1E06 on archive" || exit 0
+          git push
