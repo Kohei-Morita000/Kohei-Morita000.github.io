@@ -1,6 +1,29 @@
 <!doctype html>
-<html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>ページが見つかりません</title><meta name="robots" content="noindex,follow"><meta name="theme-color" content="#090b10"><link rel="stylesheet" href="/Kohei-Morita000.github.io/yorugatari/assets/styles.css">
-<style>.error-shell{min-height:100dvh;display:grid;place-items:center;padding:32px}.error-box{width:min(100%,680px);text-align:center;background:rgba(12,15,22,.82);border:1px solid var(--line);border-radius:var(--radius);padding:clamp(28px,7vw,64px)}.error-code{font-family:serif;font-size:clamp(4rem,18vw,8rem);line-height:1;color:var(--accent);margin:0}.error-box h1{font-family:serif}.error-actions{display:flex;justify-content:center;gap:12px;flex-wrap:wrap;margin-top:28px}</style></head>
-<body><main class="error-shell"><section class="error-box"><p class="error-code">404</p><h1 id="errorTitle">ページが見つかりません</h1><p id="errorText">URLが変更されたか、ページが削除された可能性があります。</p><div class="error-actions"><a class="btn btn-primary" id="primaryLink" href="/Kohei-Morita000.github.io/yorugatari/">夜語りへ戻る</a><button class="btn" type="button" id="backButton">前のページへ戻る</button></div></section></main>
-<script>const home='/Kohei-Morita000.github.io/yorugatari/';document.querySelector('#backButton').addEventListener('click',()=>history.length>1?history.back():location.assign(home));if(location.pathname.startsWith('/Kohei-Morita000.github.io/yorugatari/')){document.title='ページが見つかりません｜夜語り';document.querySelector('#errorTitle').textContent='その話は見つかりません';document.querySelector('#errorText').textContent='URLが違うか、まだ公開されていない怖い話です。';const a=document.querySelector('#primaryLink');a.href=home;a.textContent='夜語りへ戻る'}</script></body></html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>ページが見つかりません｜境界夜話</title>
+  <meta name="robots" content="noindex,follow">
+  <meta name="theme-color" content="#080a0f">
+  <style>
+    :root{color-scheme:dark;background:#080a0f;color:#ece7dc;font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+    *{box-sizing:border-box}
+    body{margin:0;min-height:100dvh;background:radial-gradient(circle at top,#202536 0,#0b0e15 42%,#07080c 100%);display:grid;place-items:center;padding:28px}
+    main{width:min(680px,100%);border:1px solid #393641;background:rgba(11,14,21,.9);padding:44px 34px;text-align:center;box-shadow:0 22px 70px rgba(0,0,0,.45)}
+    .code{font-family:serif;font-size:clamp(4rem,18vw,8rem);line-height:1;color:#8f2630;margin:0}
+    h1{font-family:serif;font-weight:500;margin:.25em 0 .45em}
+    p{line-height:1.9;color:#d0c9bd}
+    a{display:inline-block;margin-top:24px;color:#f3e8d4;border:1px solid #5a2530;background:#34121a;text-decoration:none;padding:12px 18px}
+    a:focus-visible{outline:3px solid #d8b76a;outline-offset:4px}
+  </style>
+</head>
+<body>
+  <main>
+    <p class="code">404</p>
+    <h1>ページが見つかりません</h1>
+    <p>URLが変更されたか、まだ公開前のページです。境界夜話のトップへ戻ってください。</p>
+    <a href="/kyokai-yawa/">境界夜話へ戻る</a>
+  </main>
+</body>
+</html>
