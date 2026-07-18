@@ -1,0 +1,24 @@
+name: Publish KKS-S1E09 and SKK-009
+on:
+  push:
+    paths:
+      - '.github/publish-kks09-skk09.trigger'
+permissions:
+  contents: write
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python .github/scripts/publish_kks09_skk09.py
+      - run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "List KKS-S1E09 and SKK-009 on archive"
+          git push
