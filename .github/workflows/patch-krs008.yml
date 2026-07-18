@@ -1,0 +1,64 @@
+name: Patch KRS-008 listing
+
+on:
+  push:
+    paths:
+      - .github/workflows/patch-krs008.yml
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Patch index and sitemap
+        shell: python
+        run: |
+          from pathlib import Path
+          index_path = Path('index.html')
+          sitemap_path = Path('sitemap.xml')
+          index = index_path.read_text(encoding='utf-8')
+          sitemap = sitemap_path.read_text(encoding='utf-8')
+          story_path = '/kyokai-yawa/stories/krs-008-se-o-mukeru-hokora.html'
+          story_url = 'https://allsunday1122.github.io' + story_path
+
+          if story_path not in index:
+              card = '''      <a class="work-card" href="/kyokai-yawa/stories/krs-008-se-o-mukeru-hokora.html"><div><span class="id">KRS-008 · 黒瀬蒐集録</span><h3>背を向ける祠</h3><p>祠の正面が記録ごとに変わり、境界の一軒だけの地区所属と玄関を正面の反対側へ組み替える。</p></div><div class="work-meta"><span class="tag">中編</span><span class="tag">約11分</span><span class="tag">恐怖 4</span></div></a>\n'''
+              marker = '      <a class="work-card" href="/kyokai-yawa/stories/skk-001-butsuma-no-natsufuku.html">'
+              if marker not in index: raise SystemExit('SKK-001 card marker not found')
+              index = index.replace(marker, card + marker, 1)
+              old = '<article class="series-card" id="series-kurose"><div class="series-card-head"><div class="series-title-row"><h3>黒瀬蒐集録</h3><span class="series-count">7話公開</span>'
+              new = '<article class="series-card" id="series-kurose"><div class="series-card-head"><div class="series-title-row"><h3>黒瀬蒐集録</h3><span class="series-count">8話公開</span>'
+              if old not in index: raise SystemExit('Kurose count marker not found')
+              index = index.replace(old, new, 1)
+              list_marker = '</ul></article>\n      <article class="series-card" id="series-sakaki">'
+              item = '<li><a class="story-link" href="/kyokai-yawa/stories/krs-008-se-o-mukeru-hokora.html"><span class="story-id">KRS-008</span><span class="story-title">背を向ける祠</span><span class="story-arrow">›</span></a></li>'
+              kurose_start = index.index('<article class="series-card" id="series-kurose">')
+              sakaki_start = index.index('<article class="series-card" id="series-sakaki">')
+              segment = index[kurose_start:sakaki_start]
+              if story_path not in segment:
+                  end = segment.rfind('</ul></article>')
+                  if end < 0: raise SystemExit('Kurose list end not found')
+                  segment = segment[:end] + item + segment[end:]
+                  index = index[:kurose_start] + segment + index[sakaki_start:]
+              index_path.write_text(index, encoding='utf-8')
+
+          if story_url not in sitemap:
+              marker = '  <url><loc>https://allsunday1122.github.io/kyokai-yawa/stories/skk-001-butsuma-no-natsufuku.html</loc>'
+              item = '  <url><loc>' + story_url + '</loc><lastmod>2026-07-18</lastmod></url>\n'
+              if marker not in sitemap: raise SystemExit('SKK-001 sitemap marker not found')
+              sitemap = sitemap.replace(marker, item + marker, 1)
+              sitemap_path.write_text(sitemap, encoding='utf-8')
+
+          Path('.github/workflows/patch-krs008.yml').unlink(missing_ok=True)
+      - name: Commit changes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html sitemap.xml .github/workflows/patch-krs008.yml
+          git commit -m "List KRS-008 on archive" || exit 0
+          git push
