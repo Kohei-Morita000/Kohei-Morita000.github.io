@@ -59,27 +59,19 @@ jobs:
         with:
           node-version: '20'
 
-      - name: Render social sharing card
+      - name: Install SVG renderer and Japanese fonts
         run: |
-          if [ ! -f assets/social-card.png ] || [ assets/social-card.svg -nt assets/social-card.png ]; then
-            sudo apt-get update
-            sudo apt-get install -y librsvg2-bin fonts-noto-cjk
-            rsvg-convert -w 1200 -h 630 assets/social-card.svg -o assets/social-card.png
-          else
-            echo "Social sharing card is current."
-          fi
+          sudo apt-get update
+          sudo apt-get install -y librsvg2-bin fonts-noto-cjk
+
+      - name: Render social sharing card
+        run: rsvg-convert -w 1200 -h 630 assets/social-card.svg -o assets/social-card.png
 
       - name: Render favicon and home screen icons
         run: |
-          if [ ! -f assets/app-icon-192.png ] || [ ! -f assets/app-icon-512.png ] || [ ! -f assets/apple-touch-icon.png ] || [ assets/app-icon.svg -nt assets/app-icon-192.png ] || [ assets/app-icon.svg -nt assets/app-icon-512.png ] || [ assets/app-icon.svg -nt assets/apple-touch-icon.png ]; then
-            sudo apt-get update
-            sudo apt-get install -y librsvg2-bin
-            rsvg-convert -w 192 -h 192 assets/app-icon.svg -o assets/app-icon-192.png
-            rsvg-convert -w 512 -h 512 assets/app-icon.svg -o assets/app-icon-512.png
-            rsvg-convert -w 180 -h 180 assets/app-icon.svg -o assets/apple-touch-icon.png
-          else
-            echo "Site icons are current."
-          fi
+          rsvg-convert -w 192 -h 192 assets/app-icon.svg -o assets/app-icon-192.png
+          rsvg-convert -w 512 -h 512 assets/app-icon.svg -o assets/app-icon-512.png
+          rsvg-convert -w 180 -h 180 assets/app-icon.svg -o assets/apple-touch-icon.png
 
       - name: Normalize site icon and manifest metadata
         run: node scripts/normalize-site-icons.mjs
