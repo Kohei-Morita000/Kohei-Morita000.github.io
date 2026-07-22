@@ -1,0 +1,70 @@
+name: Reading Backup Browser Audit
+
+on:
+  push:
+    paths:
+      - 'package.json'
+      - 'playwright.config.mjs'
+      - 'reading-log.html'
+      - 'data/works.js'
+      - 'data/reading-status.js'
+      - 'data/saved-stories.js'
+      - 'data/reading-log.css'
+      - 'data/reading-log.js'
+      - 'data/reading-backup.js'
+      - 'scripts/serve-playwright.mjs'
+      - 'scripts/reading-browser-reporter.mjs'
+      - 'tests/reading-backup.spec.mjs'
+      - '.github/workflows/reading-backup-browser-audit.yml'
+  workflow_dispatch:
+
+concurrency:
+  group: reading-backup-browser-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: write
+
+jobs:
+  browser-audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Install Playwright Test
+        run: npm install --no-audit --no-fund
+      - name: Install Chromium and WebKit
+        run: npx playwright install --with-deps chromium webkit
+      - name: Run real-browser backup and restore tests
+        id: tests
+        continue-on-error: true
+        run: npm run test:e2e
+      - name: Upload browser report traces screenshots and videos
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: reading-backup-browser-audit
+          path: |
+            reports/reading-backup-browser-audit.md
+            playwright-report
+            test-results
+          if-no-files-found: warn
+          retention-days: 14
+      - name: Commit browser audit report
+        if: always()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add reports/reading-backup-browser-audit.md
+          if git diff --cached --quiet; then
+            echo "Browser audit report is unchanged."
+          else
+            git commit -m "chore: record reading backup browser audit"
+            git pull --rebase origin main
+            git push
+          fi
+      - name: Fail when browser tests fail
+        if: steps.tests.outcome == 'failure'
+        run: exit 1
