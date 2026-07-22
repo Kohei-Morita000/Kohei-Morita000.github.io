@@ -42,4 +42,7 @@ document.getElementById('work-grid').innerHTML=works.map(w=>`<a class="work-card
 document.getElementById('series-grid').innerHTML=Object.entries(seriesInfo).map(([name,info])=>{const group=works.filter(w=>w.series===name);return `<article class="series-card" id="${esc(info.anchor)}"><div class="series-card-head"><div class="series-title-row"><h3>${esc(name)}</h3><span class="series-count">${group.length}話公開</span></div><p>${esc(info.desc)}</p></div><ul class="story-list">${group.map(w=>`<li><a class="story-link" href="/kyokai-yawa/stories/${esc(w.file)}"><span class="story-id">${esc(w.id)}</span><span class="story-title">${esc(w.title)}</span><span class="story-arrow">›</span></a></li>`).join('')}</ul></article>`}).join('');
 document.querySelector('.series-anchor-fallbacks')?.remove();
 </script>
+<!-- SW_REGISTER_START -->
+<script src="/kyokai-yawa/data/sw-register.js" defer></script>
+<!-- SW_REGISTER_END -->
 </body></html>
