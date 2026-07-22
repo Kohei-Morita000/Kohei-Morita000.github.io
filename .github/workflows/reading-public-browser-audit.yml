@@ -28,6 +28,7 @@ jobs:
   public-browser-audit:
     if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     env:
       PLAYWRIGHT_BASE_URL: https://allsunday1122.github.io/kyokai-yawa/
       READING_BROWSER_REPORT: reading-public-browser-audit.md
