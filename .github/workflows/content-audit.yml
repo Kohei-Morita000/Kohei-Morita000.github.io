@@ -6,6 +6,8 @@ on:
       - '.nojekyll'
       - 'index.html'
       - '404.html'
+      - 'offline.html'
+      - 'service-worker.js'
       - 'robots.txt'
       - 'feed.xml'
       - 'manifest.webmanifest'
@@ -19,6 +21,7 @@ on:
       - 'data/works.js'
       - 'data/story-nav.js'
       - 'data/archive-tools.js'
+      - 'data/sw-register.js'
       - 'data/story-style-*.css'
       - 'sitemap.xml'
       - 'scripts/audit-stories.mjs'
@@ -29,6 +32,7 @@ on:
       - 'scripts/audit-public-assets.mjs'
       - 'scripts/audit-discovery.mjs'
       - 'scripts/audit-site-icons.mjs'
+      - 'scripts/audit-offline.mjs'
       - 'scripts/normalize-reading-times.mjs'
       - 'scripts/normalize-story-navigation.mjs'
       - 'scripts/normalize-fear-levels.mjs'
@@ -37,6 +41,7 @@ on:
       - 'scripts/normalize-shared-story-css.mjs'
       - 'scripts/normalize-discovery.mjs'
       - 'scripts/normalize-site-icons.mjs'
+      - 'scripts/normalize-offline.mjs'
       - '.github/workflows/content-audit.yml'
   workflow_dispatch:
 
@@ -75,6 +80,9 @@ jobs:
 
       - name: Normalize site icon and manifest metadata
         run: node scripts/normalize-site-icons.mjs
+
+      - name: Normalize service worker registration and offline page
+        run: node scripts/normalize-offline.mjs
 
       - name: Normalize public asset references
         run: node scripts/normalize-public-assets.mjs
@@ -137,6 +145,11 @@ jobs:
         continue-on-error: true
         run: node scripts/audit-site-icons.mjs
 
+      - name: Audit service worker cache freshness and offline fallback
+        id: offline_audit
+        continue-on-error: true
+        run: node scripts/audit-offline.mjs
+
       - name: Upload audit reports
         if: always()
         uses: actions/upload-artifact@v4
@@ -150,7 +163,7 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add -A .nojekyll index.html 404.html robots.txt feed.xml manifest.webmanifest assets stories data sitemap.xml reports/*.md
+          git add -A .nojekyll index.html 404.html offline.html service-worker.js robots.txt feed.xml manifest.webmanifest assets stories data sitemap.xml reports/*.md
           if git diff --cached --quiet; then
             echo "Content metadata and audit reports are unchanged."
           else
@@ -159,5 +172,5 @@ jobs:
           fi
 
       - name: Fail when audit errors exist
-        if: steps.content_audit.outcome == 'failure' || steps.length_audit.outcome == 'failure' || steps.navigation_audit.outcome == 'failure' || steps.fear_audit.outcome == 'failure' || steps.html_audit.outcome == 'failure' || steps.assets_audit.outcome == 'failure' || steps.discovery_audit.outcome == 'failure' || steps.icons_audit.outcome == 'failure'
+        if: steps.content_audit.outcome == 'failure' || steps.length_audit.outcome == 'failure' || steps.navigation_audit.outcome == 'failure' || steps.fear_audit.outcome == 'failure' || steps.html_audit.outcome == 'failure' || steps.assets_audit.outcome == 'failure' || steps.discovery_audit.outcome == 'failure' || steps.icons_audit.outcome == 'failure' || steps.offline_audit.outcome == 'failure'
         run: exit 1
