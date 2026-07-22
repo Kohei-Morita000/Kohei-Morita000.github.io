@@ -8,9 +8,12 @@ on:
       - 'data/series-pages.css'
       - 'data/series-work-cards.css'
       - 'data/series-archive-tools.js'
+      - 'data/accessibility-contrast.css'
       - 'scripts/normalize-series-pages.mjs'
+      - 'scripts/normalize-accessibility-contrast.mjs'
       - 'scripts/audit-series-pages.mjs'
       - 'scripts/audit-series-work-cards.mjs'
+      - 'scripts/audit-accessibility-contrast-assets.mjs'
       - '.github/workflows/series-work-cards-audit.yml'
   workflow_dispatch:
 
@@ -31,6 +34,8 @@ jobs:
           node-version: '20'
       - name: Generate series pages
         run: node scripts/normalize-series-pages.mjs
+      - name: Normalize shared accessibility contrast stylesheet
+        run: node scripts/normalize-accessibility-contrast.mjs
       - name: Audit series pages
         id: pages
         continue-on-error: true
@@ -39,12 +44,16 @@ jobs:
         id: cards
         continue-on-error: true
         run: node scripts/audit-series-work-cards.mjs
+      - name: Audit accessibility contrast stylesheet references
+        id: contrast
+        continue-on-error: true
+        run: node scripts/audit-accessibility-contrast-assets.mjs
       - name: Commit generated pages and reports
         if: always()
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add series index.html sitemap.xml reports/series-pages-audit.md reports/series-work-cards-audit.md
+          git add series index.html sitemap.xml reports/series-pages-audit.md reports/series-work-cards-audit.md reports/accessibility-contrast-assets-audit.md
           if git diff --cached --quiet; then
             echo "Series cards and reports are unchanged."
           else
@@ -53,5 +62,5 @@ jobs:
             git push
           fi
       - name: Fail when audit errors exist
-        if: steps.pages.outcome == 'failure' || steps.cards.outcome == 'failure'
+        if: steps.pages.outcome == 'failure' || steps.cards.outcome == 'failure' || steps.contrast.outcome == 'failure'
         run: exit 1
