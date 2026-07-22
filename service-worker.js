@@ -1,4 +1,4 @@
-const VERSION = 'kyokai-yawa-v11';
+const VERSION = 'kyokai-yawa-v8';
 const STATIC_CACHE = `${VERSION}-static`;
 const PAGE_CACHE = `${VERSION}-pages`;
 const ASSET_CACHE = `${VERSION}-assets`;
