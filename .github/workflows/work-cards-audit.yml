@@ -11,6 +11,7 @@ on:
       - 'data/work-cards.css'
       - 'scripts/normalize-discovery.mjs'
       - 'scripts/normalize-related-stories.mjs'
+      - 'scripts/normalize-static-home-rendering.mjs'
       - 'scripts/audit-work-cards.mjs'
       - 'scripts/audit-related-stories.mjs'
       - 'scripts/audit-discovery.mjs'
@@ -41,6 +42,9 @@ jobs:
 
       - name: Generate comparable homepage story cards
         run: node scripts/normalize-discovery.mjs
+
+      - name: Remove legacy JavaScript rerendering
+        run: node scripts/normalize-static-home-rendering.mjs
 
       - name: Audit comparable homepage story cards
         id: cards_audit
