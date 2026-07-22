@@ -1,0 +1,79 @@
+name: Series Pages Audit
+
+on:
+  push:
+    paths:
+      - 'index.html'
+      - 'stories/**'
+      - 'series/**'
+      - 'data/works.js'
+      - 'data/story-nav.js'
+      - 'data/archive-tools.js'
+      - 'data/series-pages.css'
+      - 'data/series-links.js'
+      - 'sitemap.xml'
+      - 'scripts/normalize-series-pages.mjs'
+      - 'scripts/normalize-story-navigation.mjs'
+      - 'scripts/audit-series-pages.mjs'
+      - 'scripts/audit-story-navigation.mjs'
+      - 'scripts/audit-discovery.mjs'
+      - '.github/workflows/series-pages-audit.yml'
+  workflow_dispatch:
+
+concurrency:
+  group: series-pages-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: write
+
+jobs:
+  normalize-and-audit:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Generate series pages and homepage links
+        run: node scripts/normalize-series-pages.mjs
+
+      - name: Normalize story navigation
+        run: node scripts/normalize-story-navigation.mjs
+
+      - name: Audit series pages
+        id: series_audit
+        continue-on-error: true
+        run: node scripts/audit-series-pages.mjs
+
+      - name: Audit story navigation
+        id: navigation_audit
+        continue-on-error: true
+        run: node scripts/audit-story-navigation.mjs
+
+      - name: Audit discovery metadata and sitemap
+        id: discovery_audit
+        continue-on-error: true
+        run: node scripts/audit-discovery.mjs
+
+      - name: Commit generated pages and reports
+        if: always()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html stories series sitemap.xml reports/series-pages-audit.md reports/story-navigation-audit.md reports/discovery-audit.md
+          if git diff --cached --quiet; then
+            echo "Series pages and reports are unchanged."
+          else
+            git commit -m "chore: generate series pages and update audits"
+            git pull --rebase origin main
+            git push
+          fi
+
+      - name: Fail when series audit errors exist
+        if: steps.series_audit.outcome == 'failure' || steps.navigation_audit.outcome == 'failure' || steps.discovery_audit.outcome == 'failure'
+        run: exit 1
