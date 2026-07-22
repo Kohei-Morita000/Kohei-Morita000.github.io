@@ -18,12 +18,15 @@ on:
       - 'assets/app-icon-512.png'
       - 'assets/apple-touch-icon.png'
       - 'stories/**'
+      - 'series/**'
       - 'data/works.js'
       - 'data/story-nav.js'
       - 'data/archive-tools.js'
       - 'data/sw-register.js'
       - 'data/reader-tools.css'
       - 'data/reader-tools.js'
+      - 'data/series-pages.css'
+      - 'data/series-links.js'
       - 'data/story-style-*.css'
       - 'sitemap.xml'
       - 'scripts/audit-stories.mjs'
@@ -36,6 +39,7 @@ on:
       - 'scripts/audit-site-icons.mjs'
       - 'scripts/audit-offline.mjs'
       - 'scripts/audit-reader-experience.mjs'
+      - 'scripts/audit-series-pages.mjs'
       - 'scripts/normalize-reading-times.mjs'
       - 'scripts/normalize-story-navigation.mjs'
       - 'scripts/normalize-fear-levels.mjs'
@@ -46,6 +50,7 @@ on:
       - 'scripts/normalize-site-icons.mjs'
       - 'scripts/normalize-offline.mjs'
       - 'scripts/normalize-reader-tools.mjs'
+      - 'scripts/normalize-series-pages.mjs'
       - '.github/workflows/content-audit.yml'
   workflow_dispatch:
 
@@ -112,6 +117,9 @@ jobs:
       - name: Generate search discovery metadata RSS and social cards
         run: node scripts/normalize-discovery.mjs
 
+      - name: Generate dedicated series pages and discovery links
+        run: node scripts/normalize-series-pages.mjs
+
       - name: Audit story metadata and cross-story repetition
         id: content_audit
         continue-on-error: true
@@ -162,6 +170,11 @@ jobs:
         continue-on-error: true
         run: node scripts/audit-reader-experience.mjs
 
+      - name: Audit dedicated series pages and discovery links
+        id: series_audit
+        continue-on-error: true
+        run: node scripts/audit-series-pages.mjs
+
       - name: Upload audit reports
         if: always()
         uses: actions/upload-artifact@v4
@@ -175,7 +188,7 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add -A .nojekyll index.html 404.html offline.html service-worker.js robots.txt feed.xml manifest.webmanifest assets stories data sitemap.xml reports/*.md
+          git add -A .nojekyll index.html 404.html offline.html service-worker.js robots.txt feed.xml manifest.webmanifest assets stories series data sitemap.xml reports/*.md
           if git diff --cached --quiet; then
             echo "Content metadata and audit reports are unchanged."
           else
@@ -185,5 +198,5 @@ jobs:
           fi
 
       - name: Fail when audit errors exist
-        if: steps.content_audit.outcome == 'failure' || steps.length_audit.outcome == 'failure' || steps.navigation_audit.outcome == 'failure' || steps.fear_audit.outcome == 'failure' || steps.html_audit.outcome == 'failure' || steps.assets_audit.outcome == 'failure' || steps.discovery_audit.outcome == 'failure' || steps.icons_audit.outcome == 'failure' || steps.offline_audit.outcome == 'failure' || steps.reader_audit.outcome == 'failure'
+        if: steps.content_audit.outcome == 'failure' || steps.length_audit.outcome == 'failure' || steps.navigation_audit.outcome == 'failure' || steps.fear_audit.outcome == 'failure' || steps.html_audit.outcome == 'failure' || steps.assets_audit.outcome == 'failure' || steps.discovery_audit.outcome == 'failure' || steps.icons_audit.outcome == 'failure' || steps.offline_audit.outcome == 'failure' || steps.reader_audit.outcome == 'failure' || steps.series_audit.outcome == 'failure'
         run: exit 1
