@@ -11,12 +11,19 @@ const worksPath = path.join(root, 'data', 'works.js');
 const context = { window: {} };
 vm.runInNewContext(fs.readFileSync(worksPath, 'utf8'), context, { filename: worksPath });
 const works = context.window.KYOKAI_WORKS || [];
+const seriesInfo = context.window.KYOKAI_SERIES || {};
 const escapeXml = value => String(value ?? '')
   .replaceAll('&', '&amp;')
   .replaceAll('<', '&lt;')
   .replaceAll('>', '&gt;')
   .replaceAll('"', '&quot;')
   .replaceAll("'", '&apos;');
+const escapeHtml = value => String(value ?? '')
+  .replaceAll('&', '&amp;')
+  .replaceAll('<', '&lt;')
+  .replaceAll('>', '&gt;')
+  .replaceAll('"', '&quot;')
+  .replaceAll("'", '&#39;');
 
 const applySocialMeta = html => {
   html = html
@@ -110,6 +117,38 @@ const feedLink = `<link rel="alternate" type="application/rss+xml" title="境界
 if (!indexHtml.includes('type="application/rss+xml"')) {
   indexHtml = indexHtml.replace('</head>', `${feedLink}\n</head>`);
 }
+
+const worksStart = '<!-- STATIC_WORKS_START -->';
+const worksEnd = '<!-- STATIC_WORKS_END -->';
+const staticWorks = entries.map(entry => `<a class="work-card" href="/kyokai-yawa/stories/${escapeHtml(entry.file)}"><div><span class="id">${escapeHtml(entry.id)} · ${escapeHtml(entry.series)}</span><h3>${escapeHtml(entry.title)}</h3><p>${escapeHtml(entry.desc)}</p></div><div class="work-meta"><span class="tag">${escapeHtml(entry.length)}</span><span class="tag">${escapeHtml(entry.mins)}</span><span class="tag">恐怖 ${escapeHtml(entry.fear)}</span></div></a>`).join('');
+const staticWorksBlock = `${worksStart}${staticWorks}${worksEnd}`;
+if (indexHtml.includes(worksStart)) {
+  indexHtml = indexHtml.replace(new RegExp(`${worksStart}[\\s\\S]*?${worksEnd}`), staticWorksBlock);
+} else {
+  const emptyWorks = /<div class="work-grid" id="work-grid">\s*<\/div>/;
+  if (!emptyWorks.test(indexHtml)) throw new Error('index.html: 静的作品一覧の挿入先が見つかりません');
+  indexHtml = indexHtml.replace(emptyWorks, `<div class="work-grid" id="work-grid">${staticWorksBlock}</div>`);
+}
+
+const seriesStart = '<!-- STATIC_SERIES_START -->';
+const seriesEnd = '<!-- STATIC_SERIES_END -->';
+const staticSeries = Object.entries(seriesInfo).map(([name, info]) => {
+  const group = entries.filter(entry => entry.series === name);
+  return `<article class="series-card" id="${escapeHtml(info.anchor)}"><div class="series-card-head"><div class="series-title-row"><h3>${escapeHtml(name)}</h3><span class="series-count">${group.length}話公開</span></div><p>${escapeHtml(info.desc)}</p></div><ul class="story-list">${group.map(entry => `<li><a class="story-link" href="/kyokai-yawa/stories/${escapeHtml(entry.file)}"><span class="story-id">${escapeHtml(entry.id)}</span><span class="story-title">${escapeHtml(entry.title)}</span><span class="story-arrow">›</span></a></li>`).join('')}</ul></article>`;
+}).join('');
+const staticSeriesBlock = `${seriesStart}${staticSeries}${seriesEnd}`;
+if (indexHtml.includes(seriesStart)) {
+  indexHtml = indexHtml.replace(new RegExp(`${seriesStart}[\\s\\S]*?${seriesEnd}`), staticSeriesBlock);
+} else {
+  const emptySeries = /<div class="series-grid" id="series-grid">\s*<\/div>/;
+  if (!emptySeries.test(indexHtml)) throw new Error('index.html: 静的シリーズ一覧の挿入先が見つかりません');
+  indexHtml = indexHtml.replace(emptySeries, `<div class="series-grid" id="series-grid">${staticSeriesBlock}</div>`);
+}
+
+indexHtml = indexHtml
+  .replace(/<div class="series-anchor-fallbacks"[^>]*>[\s\S]*?<\/div>/i, '')
+  .replace(/<noscript>[\s\S]*?<\/noscript>/i, '<noscript>検索・絞り込み機能を使うにはJavaScriptを有効にしてください。作品リンクはそのまま利用できます。</noscript>');
+
 fs.writeFileSync(indexPath, indexHtml);
 
 const sorted = [...entries].sort((a, b) =>
@@ -137,4 +176,4 @@ ${sorted.map(entry => `    <item>
 `;
 fs.writeFileSync(path.join(root, 'feed.xml'), rss);
 
-console.log(`# 検索・フィード・SNS共有正規化\n\n- 構造化作品一覧: ${entries.length}話\n- RSS項目: ${sorted.length}話\n- OGP・X共有画像: トップ＋${entries.length}話\n`);
+console.log(`# 検索・フィード・SNS共有正規化\n\n- 構造化作品一覧: ${entries.length}話\n- 静的作品リンク: ${entries.length}話\n- 静的シリーズ棚: ${Object.keys(seriesInfo).length}件\n- RSS項目: ${sorted.length}話\n- OGP・X共有画像: トップ＋${entries.length}話\n`);
