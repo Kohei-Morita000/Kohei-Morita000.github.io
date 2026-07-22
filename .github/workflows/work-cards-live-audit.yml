@@ -31,16 +31,19 @@ jobs:
       - name: Audit production homepage story cards
         run: node scripts/audit-live-work-cards.mjs
 
-      - name: Commit production audit report
+      - name: Audit production static homepage rendering
+        run: node scripts/audit-live-static-home-rendering.mjs
+
+      - name: Commit production audit reports
         if: always()
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add reports/live-work-cards-audit.md
+          git add reports/live-work-cards-audit.md reports/live-static-home-rendering-audit.md
           if git diff --cached --quiet; then
-            echo "Production story card audit is unchanged."
+            echo "Production story card audits are unchanged."
           else
-            git commit -m "chore: record homepage story card production audit"
+            git commit -m "chore: record homepage story card production audits"
             git pull --rebase origin main
             git push
           fi
