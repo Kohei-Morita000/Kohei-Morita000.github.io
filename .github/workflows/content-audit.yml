@@ -27,6 +27,8 @@ on:
       - 'data/reader-tools.js'
       - 'data/series-pages.css'
       - 'data/series-links.js'
+      - 'data/related-stories.css'
+      - 'data/story-taxonomy.json'
       - 'data/story-style-*.css'
       - 'sitemap.xml'
       - 'scripts/audit-stories.mjs'
@@ -40,6 +42,7 @@ on:
       - 'scripts/audit-offline.mjs'
       - 'scripts/audit-reader-experience.mjs'
       - 'scripts/audit-series-pages.mjs'
+      - 'scripts/audit-related-stories.mjs'
       - 'scripts/normalize-reading-times.mjs'
       - 'scripts/normalize-story-navigation.mjs'
       - 'scripts/normalize-fear-levels.mjs'
@@ -51,6 +54,7 @@ on:
       - 'scripts/normalize-offline.mjs'
       - 'scripts/normalize-reader-tools.mjs'
       - 'scripts/normalize-series-pages.mjs'
+      - 'scripts/normalize-related-stories.mjs'
       - '.github/workflows/content-audit.yml'
   workflow_dispatch:
 
@@ -120,6 +124,9 @@ jobs:
       - name: Generate dedicated series pages and discovery links
         run: node scripts/normalize-series-pages.mjs
 
+      - name: Generate story tags aftertaste and related links
+        run: node scripts/normalize-related-stories.mjs
+
       - name: Audit story metadata and cross-story repetition
         id: content_audit
         continue-on-error: true
@@ -175,6 +182,11 @@ jobs:
         continue-on-error: true
         run: node scripts/audit-series-pages.mjs
 
+      - name: Audit story tags aftertaste and related links
+        id: related_audit
+        continue-on-error: true
+        run: node scripts/audit-related-stories.mjs
+
       - name: Upload audit reports
         if: always()
         uses: actions/upload-artifact@v4
@@ -198,5 +210,5 @@ jobs:
           fi
 
       - name: Fail when audit errors exist
-        if: steps.content_audit.outcome == 'failure' || steps.length_audit.outcome == 'failure' || steps.navigation_audit.outcome == 'failure' || steps.fear_audit.outcome == 'failure' || steps.html_audit.outcome == 'failure' || steps.assets_audit.outcome == 'failure' || steps.discovery_audit.outcome == 'failure' || steps.icons_audit.outcome == 'failure' || steps.offline_audit.outcome == 'failure' || steps.reader_audit.outcome == 'failure' || steps.series_audit.outcome == 'failure'
+        if: steps.content_audit.outcome == 'failure' || steps.length_audit.outcome == 'failure' || steps.navigation_audit.outcome == 'failure' || steps.fear_audit.outcome == 'failure' || steps.html_audit.outcome == 'failure' || steps.assets_audit.outcome == 'failure' || steps.discovery_audit.outcome == 'failure' || steps.icons_audit.outcome == 'failure' || steps.offline_audit.outcome == 'failure' || steps.reader_audit.outcome == 'failure' || steps.series_audit.outcome == 'failure' || steps.related_audit.outcome == 'failure'
         run: exit 1
