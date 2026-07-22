@@ -4,6 +4,7 @@ import vm from 'node:vm';
 
 const root = process.cwd();
 const base = 'https://allsunday1122.github.io/kyokai-yawa/';
+const socialImage = `${base}assets/social-card.png`;
 const errors = [];
 const warnings = [];
 const worksPath = path.join(root, 'data', 'works.js');
@@ -12,7 +13,7 @@ vm.runInNewContext(fs.readFileSync(worksPath, 'utf8'), context, { filename: work
 const works = context.window.KYOKAI_WORKS || [];
 const expectedUrls = new Set(works.map(work => `${base}stories/${work.file}`));
 
-const required = ['index.html', '404.html', 'robots.txt', 'sitemap.xml', 'feed.xml'];
+const required = ['index.html', '404.html', 'robots.txt', 'sitemap.xml', 'feed.xml', 'assets/social-card.svg', 'assets/social-card.png'];
 for (const file of required) {
   if (!fs.existsSync(path.join(root, file))) errors.push(`${file}が存在しません`);
 }
@@ -29,6 +30,7 @@ if (graph) {
   if (!website) errors.push('index.html: WebSite構造化データがありません');
   if (!collection) errors.push('index.html: CollectionPage構造化データがありません');
   if (!list) errors.push('index.html: ItemList構造化データがありません');
+  if (collection?.primaryImageOfPage?.url !== socialImage) errors.push('CollectionPageのprimaryImageOfPageが不正です');
   if (list) {
     const items = Array.isArray(list.itemListElement) ? list.itemListElement : [];
     if (list.numberOfItems !== works.length) errors.push(`ItemList numberOfItemsが${works.length}ではありません`);
@@ -73,16 +75,33 @@ if (fs.existsSync(path.join(root, 'feed.xml'))) {
   for (const url of expectedUrls) if (!feedItems.includes(url)) errors.push(`RSSに${url}がありません`);
 }
 
-const ogImageCount = [indexHtml, ...works.map(work => fs.readFileSync(path.join(root, 'stories', work.file), 'utf8'))]
-  .filter(html => /<meta\s+property=["']og:image["']/i.test(html)).length;
-if (ogImageCount === 0) warnings.push('SNS共有画像（og:image）が未設定です。PNGまたはJPEGの共通カードを作成後に反映してください');
+const publicPages = [
+  { id: 'index.html', html: indexHtml },
+  ...works.map(work => ({ id: work.id, html: fs.readFileSync(path.join(root, 'stories', work.file), 'utf8') })),
+];
+for (const page of publicPages) {
+  const ogImage = page.html.match(/<meta\s+property=["']og:image["']\s+content=["']([^"']+)["']/i)?.[1] || '';
+  const twitterImage = page.html.match(/<meta\s+name=["']twitter:image["']\s+content=["']([^"']+)["']/i)?.[1] || '';
+  const twitterCard = page.html.match(/<meta\s+name=["']twitter:card["']\s+content=["']([^"']+)["']/i)?.[1] || '';
+  if (ogImage !== socialImage) errors.push(`${page.id}: og:imageが不正です`);
+  if (twitterImage !== socialImage) errors.push(`${page.id}: twitter:imageが不正です`);
+  if (twitterCard !== 'summary_large_image') errors.push(`${page.id}: twitter:cardがsummary_large_imageではありません`);
+  if (!/<meta\s+property=["']og:image:width["']\s+content=["']1200["']/i.test(page.html)) errors.push(`${page.id}: og:image:widthがありません`);
+  if (!/<meta\s+property=["']og:image:height["']\s+content=["']630["']/i.test(page.html)) errors.push(`${page.id}: og:image:heightがありません`);
+}
+
+if (fs.existsSync(path.join(root, 'assets', 'social-card.png'))) {
+  const size = fs.statSync(path.join(root, 'assets', 'social-card.png')).size;
+  if (size > 1024 * 1024) warnings.push(`SNS共有画像が1MiBを超えています（${(size / 1024).toFixed(1)}KiB）`);
+}
 
 const report = [
-  '# 境界夜話 検索流入・404・フィード監査',
+  '# 境界夜話 検索流入・404・フィード・SNS共有監査',
   '',
   `- 公開作品: ${works.length}話`,
   `- sitemap URL: ${works.length + 1}件`,
   `- RSS項目: ${feedItems.length}件`,
+  `- SNS共有画像設定ページ: ${publicPages.length}件`,
   `- エラー: ${errors.length}`,
   `- 警告: ${warnings.length}`,
   '',
