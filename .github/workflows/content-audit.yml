@@ -46,8 +46,8 @@ on:
   workflow_dispatch:
 
 concurrency:
-  group: content-audit-${{ github.ref }}
-  cancel-in-progress: true
+  group: kyokai-yawa-write-${{ github.ref }}
+  cancel-in-progress: false
 
 permissions:
   contents: write
@@ -168,6 +168,7 @@ jobs:
             echo "Content metadata and audit reports are unchanged."
           else
             git commit -m "chore: normalize public pages and update audit reports"
+            git pull --rebase origin main
             git push
           fi
 
