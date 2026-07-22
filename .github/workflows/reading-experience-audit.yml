@@ -1,0 +1,114 @@
+name: Reading Experience Audit
+
+on:
+  push:
+    paths:
+      - 'index.html'
+      - 'reading-log.html'
+      - 'stories/**'
+      - 'series/**'
+      - 'service-worker.js'
+      - 'data/works.js'
+      - 'data/reader-tools.css'
+      - 'data/reader-tools.js'
+      - 'data/reading-status.css'
+      - 'data/reading-status.js'
+      - 'data/saved-stories.css'
+      - 'data/saved-stories.js'
+      - 'data/home-personalization.css'
+      - 'data/home-personalization.js'
+      - 'data/archive-tools.js'
+      - 'data/series-archive-tools.js'
+      - 'data/reading-log.css'
+      - 'data/reading-log.js'
+      - 'data/reading-backup.js'
+      - 'scripts/normalize-reader-tools.mjs'
+      - 'scripts/normalize-reading-status.mjs'
+      - 'scripts/normalize-home-personalization.mjs'
+      - 'scripts/normalize-saved-stories.mjs'
+      - 'scripts/normalize-saved-stories-offline.mjs'
+      - 'scripts/normalize-reading-log.mjs'
+      - 'scripts/normalize-reading-log-offline.mjs'
+      - 'scripts/audit-reader-experience.mjs'
+      - 'scripts/audit-reading-status.mjs'
+      - 'scripts/audit-home-personalization.mjs'
+      - 'scripts/audit-saved-stories.mjs'
+      - 'scripts/audit-reading-log.mjs'
+      - 'scripts/audit-reading-backup.mjs'
+      - 'scripts/audit-offline.mjs'
+      - '.github/workflows/reading-experience-audit.yml'
+  workflow_dispatch:
+
+concurrency:
+  group: reading-experience-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: write
+
+jobs:
+  normalize-and-audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Normalize reader controls
+        run: node scripts/normalize-reader-tools.mjs
+      - name: Normalize reading completion status
+        run: node scripts/normalize-reading-status.mjs
+      - name: Normalize personalized homepage
+        run: node scripts/normalize-home-personalization.mjs
+      - name: Normalize save for later
+        run: node scripts/normalize-saved-stories.mjs
+      - name: Normalize saved story offline assets
+        run: node scripts/normalize-saved-stories-offline.mjs
+      - name: Normalize reading log and backup panel
+        run: node scripts/normalize-reading-log.mjs
+      - name: Normalize reading log offline assets
+        run: node scripts/normalize-reading-log-offline.mjs
+      - name: Audit reader controls
+        id: reader
+        continue-on-error: true
+        run: node scripts/audit-reader-experience.mjs
+      - name: Audit reading completion status
+        id: status
+        continue-on-error: true
+        run: node scripts/audit-reading-status.mjs
+      - name: Audit personalized homepage
+        id: personalization
+        continue-on-error: true
+        run: node scripts/audit-home-personalization.mjs
+      - name: Audit save for later
+        id: saved
+        continue-on-error: true
+        run: node scripts/audit-saved-stories.mjs
+      - name: Audit reading log
+        id: log
+        continue-on-error: true
+        run: node scripts/audit-reading-log.mjs
+      - name: Audit reading backup and restore
+        id: backup
+        continue-on-error: true
+        run: node scripts/audit-reading-backup.mjs
+      - name: Audit offline behavior
+        id: offline
+        continue-on-error: true
+        run: node scripts/audit-offline.mjs
+      - name: Commit normalized reading experience and reports
+        if: always()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html reading-log.html stories series service-worker.js reports/reader-experience-audit.md reports/reading-status-audit.md reports/home-personalization-audit.md reports/saved-stories-audit.md reports/reading-log-audit.md reports/reading-backup-audit.md reports/offline-audit.md
+          if git diff --cached --quiet; then
+            echo "Reading experience and reports are unchanged."
+          else
+            git commit -m "chore: normalize and audit reading experience"
+            git pull --rebase origin main
+            git push
+          fi
+      - name: Fail when reading experience audit errors exist
+        if: steps.reader.outcome == 'failure' || steps.status.outcome == 'failure' || steps.personalization.outcome == 'failure' || steps.saved.outcome == 'failure' || steps.log.outcome == 'failure' || steps.backup.outcome == 'failure' || steps.offline.outcome == 'failure'
+        run: exit 1
