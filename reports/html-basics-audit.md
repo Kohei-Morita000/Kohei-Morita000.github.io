@@ -1,52 +1,12 @@
 # 境界夜話 HTML・内部リンク・アクセシビリティ監査
 
 - 対象: 48話
-- エラー: 41
+- エラー: 0
 - 警告: 0
 
 ## エラー
 
-- MKB-001: 未確認の内部リンク /kyokai-yawa/data/story-style-75fc2972955b.css
-- MKB-002: 未確認の内部リンク /kyokai-yawa/data/story-style-75fc2972955b.css
-- MKB-003: 未確認の内部リンク /kyokai-yawa/data/story-style-bf1f39524cf2.css
-- MKB-004: 未確認の内部リンク /kyokai-yawa/data/story-style-75fc2972955b.css
-- MKB-005: 未確認の内部リンク /kyokai-yawa/data/story-style-75fc2972955b.css
-- MKB-006: 未確認の内部リンク /kyokai-yawa/data/story-style-75fc2972955b.css
-- MKB-007: 未確認の内部リンク /kyokai-yawa/data/story-style-75fc2972955b.css
-- MKB-008: 未確認の内部リンク /kyokai-yawa/data/story-style-bf1f39524cf2.css
-- MKB-009: 未確認の内部リンク /kyokai-yawa/data/story-style-bf1f39524cf2.css
-- MKB-010: 未確認の内部リンク /kyokai-yawa/data/story-style-7a1c1c9dc9d5.css
-- MKB-011: 未確認の内部リンク /kyokai-yawa/data/story-style-2ba104e3db77.css
-- MKB-012: 未確認の内部リンク /kyokai-yawa/data/story-style-2ba104e3db77.css
-- KRS-001: 未確認の内部リンク /kyokai-yawa/data/story-style-75fc2972955b.css
-- KRS-003: 未確認の内部リンク /kyokai-yawa/data/story-style-75fc2972955b.css
-- KRS-005: 未確認の内部リンク /kyokai-yawa/data/story-style-75fc2972955b.css
-- KRS-006: 未確認の内部リンク /kyokai-yawa/data/story-style-75fc2972955b.css
-- KRS-007: 未確認の内部リンク /kyokai-yawa/data/story-style-75fc2972955b.css
-- KRS-008: 未確認の内部リンク /kyokai-yawa/data/story-style-75fc2972955b.css
-- KRS-009: 未確認の内部リンク /kyokai-yawa/data/story-style-75fc2972955b.css
-- KRS-010: 未確認の内部リンク /kyokai-yawa/data/story-style-7a1c1c9dc9d5.css
-- KRS-011: 未確認の内部リンク /kyokai-yawa/data/story-style-2ba104e3db77.css
-- KRS-012: 未確認の内部リンク /kyokai-yawa/data/story-style-7a1c1c9dc9d5.css
-- SKK-001: 未確認の内部リンク /kyokai-yawa/data/story-style-75fc2972955b.css
-- SKK-003: 未確認の内部リンク /kyokai-yawa/data/story-style-75fc2972955b.css
-- SKK-004: 未確認の内部リンク /kyokai-yawa/data/story-style-75fc2972955b.css
-- SKK-005: 未確認の内部リンク /kyokai-yawa/data/story-style-75fc2972955b.css
-- SKK-006: 未確認の内部リンク /kyokai-yawa/data/story-style-75fc2972955b.css
-- SKK-007: 未確認の内部リンク /kyokai-yawa/data/story-style-bd1b211af438.css
-- SKK-008: 未確認の内部リンク /kyokai-yawa/data/story-style-bd1b211af438.css
-- SKK-009: 未確認の内部リンク /kyokai-yawa/data/story-style-7a1c1c9dc9d5.css
-- SKK-011: 未確認の内部リンク /kyokai-yawa/data/story-style-7a1c1c9dc9d5.css
-- SKK-012: 未確認の内部リンク /kyokai-yawa/data/story-style-7a1c1c9dc9d5.css
-- KKS-S1E01: 未確認の内部リンク /kyokai-yawa/data/story-style-75fc2972955b.css
-- KKS-S1E02: 未確認の内部リンク /kyokai-yawa/data/story-style-75fc2972955b.css
-- KKS-S1E03: 未確認の内部リンク /kyokai-yawa/data/story-style-75fc2972955b.css
-- KKS-S1E04: 未確認の内部リンク /kyokai-yawa/data/story-style-75fc2972955b.css
-- KKS-S1E05: 未確認の内部リンク /kyokai-yawa/data/story-style-75fc2972955b.css
-- KKS-S1E07: 未確認の内部リンク /kyokai-yawa/data/story-style-bd1b211af438.css
-- KKS-S1E09: 未確認の内部リンク /kyokai-yawa/data/story-style-2ba104e3db77.css
-- KKS-S1E10: 未確認の内部リンク /kyokai-yawa/data/story-style-2ba104e3db77.css
-- KKS-S1E11: 未確認の内部リンク /kyokai-yawa/data/story-style-2ba104e3db77.css
+- なし
 
 ## 警告
 
