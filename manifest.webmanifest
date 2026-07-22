@@ -1,0 +1,26 @@
+{
+  "name": "境界夜話｜四つの怪談アーカイブ",
+  "short_name": "境界夜話",
+  "description": "真壁夜話・黒瀬蒐集録・榊家異聞・境界観測記を収録する連作怪談アーカイブ。",
+  "lang": "ja",
+  "start_url": "/kyokai-yawa/",
+  "scope": "/kyokai-yawa/",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#090b10",
+  "theme_color": "#090b10",
+  "icons": [
+    {
+      "src": "/kyokai-yawa/assets/app-icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/kyokai-yawa/assets/app-icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
