@@ -26,7 +26,9 @@ for(const [fragment,label] of requirements)if(!workflow.includes(fragment))error
 if(pkg.devDependencies?.['@axe-core/playwright']!=='4.10.2')errors.push('@axe-core/playwrightの固定バージョンがありません');
 if(!config.includes('siteHealthMode')||!config.includes('site-health-reporter.mjs'))errors.push('Playwright設定に品質監査レポーター切替がありません');
 for(const token of ['wcag2a','wcag2aa','wcag21a','wcag21aa','pageerror','requestfailed','consoleErrors','badResponses'])if(!tests.includes(token))errors.push(`品質試験に必要な監視がありません: ${token}`);
-for(const token of ['トップ','真壁夜話','黒瀬蒐集録','榊怪異相談所','境界観測記','単独作品','連作作品','読書記録'])if(!tests.includes(token))errors.push(`代表ページが品質試験にありません: ${token}`);
+const targetLabels=['トップ','真壁夜話','黒瀬蒐集録','榊怪異相談所','境界観測記','単独作品','連作作品','読書記録'];
+for(const token of targetLabels)if(!tests.includes(token))errors.push(`代表ページが品質試験にありません: ${token}`);
+if(targetLabels.length*2!==16)errors.push('品質試験の想定ケース数が16件ではありません');
 if(!reporter.includes('アクセシビリティ・実行時品質監査'))errors.push('品質監査レポート見出しがありません');
 if(!workflow.includes('playwright-report')||!workflow.includes('test-results'))errors.push('失敗時のトレース・画面資料が保存対象にありません');
 
@@ -37,6 +39,7 @@ const report=[
   '- 追加実行: 公開読書監査完了後・設定変更時・手動',
   '- ブラウザー: Chromium desktop / WebKit mobile',
   '- 対象ページ: トップ・4シリーズ・単独作品・連作作品・読書記録',
+  '- 実行ケース: 8ページ×2ブラウザー＝16件',
   '- アクセシビリティ: axe-core WCAG 2.1 A/AA',
   '- 実行時監視: console.error・JavaScript例外・通信失敗・HTTP 4xx/5xx',
   '- 再試行: 最大1回',
