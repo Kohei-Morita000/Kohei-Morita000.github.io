@@ -1,0 +1,64 @@
+name: Entry Guide Audit
+
+on:
+  push:
+    paths:
+      - 'index.html'
+      - 'data/entry-guide.css'
+      - 'scripts/normalize-entry-guide.mjs'
+      - 'scripts/audit-entry-guide.mjs'
+      - '.github/workflows/entry-guide-audit.yml'
+  workflow_dispatch:
+
+concurrency:
+  group: entry-guide-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: write
+
+jobs:
+  normalize-and-audit:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Generate first-time reader entry guide
+        run: node scripts/normalize-entry-guide.mjs
+
+      - name: Audit first-time reader entry guide
+        id: entry_audit
+        continue-on-error: true
+        run: node scripts/audit-entry-guide.mjs
+
+      - name: Upload entry guide audit report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: entry-guide-audit-report
+          path: reports/entry-guide-audit.md
+          if-no-files-found: error
+
+      - name: Commit generated homepage and report
+        if: always()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html data/entry-guide.css reports/entry-guide-audit.md
+          if git diff --cached --quiet; then
+            echo "Entry guide and report are unchanged."
+          else
+            git commit -m "chore: publish first-time reader entry guide"
+            git pull --rebase origin main
+            git push
+          fi
+
+      - name: Fail when entry guide audit errors exist
+        if: steps.entry_audit.outcome == 'failure'
+        run: exit 1
