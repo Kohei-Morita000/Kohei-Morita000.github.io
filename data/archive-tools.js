@@ -14,9 +14,28 @@
       .archive-tools button:hover{background:#211b13}
       .archive-result{grid-column:1/-1;margin:0;color:var(--muted);font-size:.9rem}
       .work-card[hidden]{display:none}
+      .series-detail-link{display:inline-flex;min-height:44px;align-items:center;margin-top:14px;padding:0 13px;border:1px solid var(--line);background:#21150f;color:#f0dfc0;text-decoration:none}
+      .series-detail-link:hover{border-color:var(--gold)}
       @media(max-width:720px){.archive-tools{grid-template-columns:1fr}.archive-result{grid-column:1}}
     `;
     document.head.appendChild(style);
+
+    const seriesPages={
+      'series-makabe':'/kyokai-yawa/series/makabe.html',
+      'series-kurose':'/kyokai-yawa/series/kurose.html',
+      'series-sakaki':'/kyokai-yawa/series/sakaki.html',
+      'series-kansoku':'/kyokai-yawa/series/kansoku.html',
+    };
+    for(const [id,href] of Object.entries(seriesPages)){
+      const card=document.getElementById(id);
+      const head=card?.querySelector('.series-card-head');
+      if(!head||head.querySelector('.series-detail-link'))continue;
+      const link=document.createElement('a');
+      link.className='series-detail-link';
+      link.href=href;
+      link.textContent='シリーズの案内と全話一覧';
+      head.appendChild(link);
+    }
 
     const tools=document.createElement('div');
     tools.className='archive-tools';
