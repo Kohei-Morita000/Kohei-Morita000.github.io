@@ -9,15 +9,9 @@
   const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   const safeStorage = {
-    get(key) {
-      try { return localStorage.getItem(key); } catch { return null; }
-    },
-    set(key, value) {
-      try { localStorage.setItem(key, value); } catch {}
-    },
-    remove(key) {
-      try { localStorage.removeItem(key); } catch {}
-    },
+    get(key) { try { return localStorage.getItem(key); } catch { return null; } },
+    set(key, value) { try { localStorage.setItem(key, value); } catch {} },
+    remove(key) { try { localStorage.removeItem(key); } catch {} },
   };
 
   const savedSize = safeStorage.get(sizeKey);
@@ -93,6 +87,7 @@
   let currentRatio = 0;
   let ticking = false;
   let lastSavedAt = 0;
+  let completionSent = false;
   const clamp = value => Math.min(1, Math.max(0, value));
 
   function updateProgress() {
@@ -107,6 +102,10 @@
     const now = Date.now();
     if (currentRatio >= 0.97) {
       safeStorage.remove(positionKey);
+      if (!completionSent) {
+        completionSent = true;
+        document.dispatchEvent(new CustomEvent('kyokai-story-complete', { detail: { ratio: currentRatio } }));
+      }
     } else if (currentRatio >= 0.03 && now - lastSavedAt >= 800) {
       safeStorage.set(positionKey, currentRatio.toFixed(4));
       lastSavedAt = now;
