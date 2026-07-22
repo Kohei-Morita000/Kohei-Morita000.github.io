@@ -9,6 +9,7 @@ vm.runInNewContext(fs.readFileSync(worksPath, 'utf8'), context, { filename: work
 
 const works = context.window.KYOKAI_WORKS || [];
 const expectedSeries = ['真壁夜話', '黒瀬蒐集録', '榊家異聞', '境界観測記'];
+const charsPerMinute = 350;
 const errors = [];
 const warnings = [];
 const rows = [];
@@ -97,7 +98,7 @@ for (const work of works) {
   }
 
   const chars = Array.from(article).length;
-  const estimatedMinutes = Math.max(1, Math.ceil(chars / 500));
+  const estimatedMinutes = Math.max(1, Math.ceil(chars / charsPerMinute));
   const pageMinutes = extractMinutes(html, /<div class="meta"[^>]*>[\s\S]*?<span>約(\d+)分<\/span>/i, 'ページ読了時間', work.file);
   const jsonMinutes = extractMinutes(html, /"timeRequired"\s*:\s*"PT(\d+)M"/i, 'JSON-LD読了時間', work.file);
   const listMatch = String(work.mins || '').match(/約(\d+)分/);
@@ -110,7 +111,7 @@ for (const work of works) {
   }
 
   if (Number.isFinite(pageMinutes) && Math.abs(pageMinutes - estimatedMinutes) > 1) {
-    warnings.push(`${work.id}: 表示${pageMinutes}分、500字/分基準では約${estimatedMinutes}分（本文${chars.toLocaleString('ja-JP')}字）`);
+    warnings.push(`${work.id}: 表示${pageMinutes}分、${charsPerMinute}字/分基準では約${estimatedMinutes}分（本文${chars.toLocaleString('ja-JP')}字）`);
   }
 
   const canonical = html.match(/<link rel="canonical" href="([^"]+)"/i)?.[1] || '';
@@ -185,7 +186,7 @@ const report = [
   `- 作品数: ${works.length}`,
   `- エラー: ${errors.length}`,
   `- 警告: ${warnings.length}`,
-  `- 読了時間推定基準: 本文500文字／分、端数切り上げ`,
+  `- 読了時間推定基準: 本文${charsPerMinute}文字／分、端数切り上げ`,
   `- 類似度基準: 本文の5文字連続列によるJaccard係数`,
   '',
   '## シリーズ別作品数',
@@ -218,7 +219,7 @@ const report = [
   '',
   '## 作品別一覧',
   '',
-  '| ID | シリーズ | 作品名 | 本文文字数 | 表示 | 500字/分推定 | 差 |',
+  `| ID | シリーズ | 作品名 | 本文文字数 | 表示 | ${charsPerMinute}字/分推定 | 差 |`,
   '|---|---|---|---:|---:|---:|---:|',
   ...rows.map(row => `| ${row.id} | ${row.series} | ${row.title.replace(/\|/g, '｜')} | ${row.chars.toLocaleString('ja-JP')} | ${row.displayed ?? '-'}分 | ${row.estimated}分 | ${row.delta === null ? '-' : `${row.delta > 0 ? '+' : ''}${row.delta}`} |`),
   '',
