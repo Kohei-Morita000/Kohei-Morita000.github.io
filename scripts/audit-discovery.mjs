@@ -12,12 +12,23 @@ const context = { window: {} };
 vm.runInNewContext(fs.readFileSync(worksPath, 'utf8'), context, { filename: worksPath });
 const works = context.window.KYOKAI_WORKS || [];
 const seriesInfo = context.window.KYOKAI_SERIES || {};
+const seriesPages = {
+  '真壁夜話': 'makabe.html',
+  '黒瀬蒐集録': 'kurose.html',
+  '榊家異聞': 'sakaki.html',
+  '境界観測記': 'kansoku.html',
+};
 const expectedUrls = new Set(works.map(work => `${base}stories/${work.file}`));
 const expectedPaths = new Set(works.map(work => `/kyokai-yawa/stories/${work.file}`));
+const expectedSeriesUrls = new Set(Object.values(seriesPages).map(file => `${base}series/${file}`));
+const expectedSeriesPaths = new Set(Object.values(seriesPages).map(file => `/kyokai-yawa/series/${file}`));
 
-const required = ['index.html', '404.html', 'robots.txt', 'sitemap.xml', 'feed.xml', 'assets/social-card.svg', 'assets/social-card.png'];
+const required = ['index.html', '404.html', 'robots.txt', 'sitemap.xml', 'feed.xml', 'assets/social-card.svg', 'assets/social-card.png', 'data/series-pages.css'];
 for (const file of required) {
   if (!fs.existsSync(path.join(root, file))) errors.push(`${file}が存在しません`);
+}
+for (const file of Object.values(seriesPages)) {
+  if (!fs.existsSync(path.join(root, 'series', file))) errors.push(`series/${file}が存在しません`);
 }
 
 const indexHtml = fs.existsSync(path.join(root, 'index.html')) ? fs.readFileSync(path.join(root, 'index.html'), 'utf8') : '';
@@ -53,8 +64,10 @@ for (const storyPath of expectedPaths) if (!staticStoryPaths.has(storyPath)) err
 
 const staticSeries = indexHtml.match(/<!-- STATIC_SERIES_START -->([\s\S]*?)<!-- STATIC_SERIES_END -->/)?.[1] || '';
 if (!staticSeries) errors.push('index.htmlに静的シリーズ一覧がありません');
-for (const info of Object.values(seriesInfo)) {
+for (const [name, info] of Object.entries(seriesInfo)) {
   if (!new RegExp(`id=["']${info.anchor}["']`).test(staticSeries)) errors.push(`静的シリーズ一覧に#${info.anchor}がありません`);
+  const page = seriesPages[name];
+  if (!page || !staticSeries.includes(`/kyokai-yawa/series/${page}`)) errors.push(`静的シリーズ一覧に${name}の専用ページリンクがありません`);
 }
 if (/JavaScriptを有効にしてください。<\/noscript>/.test(indexHtml)) warnings.push('noscriptが作品自体を閲覧できない表現になっています');
 
@@ -72,12 +85,15 @@ if (fs.existsSync(path.join(root, 'robots.txt'))) {
   if (!robots.includes(`Sitemap: ${base}sitemap.xml`)) errors.push('robots.txtのSitemap URLが不正です');
 }
 
+let sitemapUrls = [];
 if (fs.existsSync(path.join(root, 'sitemap.xml'))) {
   const sitemap = fs.readFileSync(path.join(root, 'sitemap.xml'), 'utf8');
-  const urls = [...sitemap.matchAll(/<loc>([^<]+)<\/loc>/g)].map(match => match[1]);
-  if (urls.length !== works.length + 1) errors.push(`sitemap URL数が${works.length + 1}件ではありません（${urls.length}件）`);
-  if (!urls.includes(base)) errors.push('sitemapにトップURLがありません');
-  for (const url of expectedUrls) if (!urls.includes(url)) errors.push(`sitemapに${url}がありません`);
+  sitemapUrls = [...sitemap.matchAll(/<loc>([^<]+)<\/loc>/g)].map(match => match[1]);
+  const expectedCount = works.length + expectedSeriesUrls.size + 1;
+  if (sitemapUrls.length !== expectedCount) errors.push(`sitemap URL数が${expectedCount}件ではありません（${sitemapUrls.length}件）`);
+  if (!sitemapUrls.includes(base)) errors.push('sitemapにトップURLがありません');
+  for (const url of expectedUrls) if (!sitemapUrls.includes(url)) errors.push(`sitemapに${url}がありません`);
+  for (const url of expectedSeriesUrls) if (!sitemapUrls.includes(url)) errors.push(`sitemapに${url}がありません`);
 }
 
 let feedItems = [];
@@ -93,6 +109,7 @@ if (fs.existsSync(path.join(root, 'feed.xml'))) {
 const publicPages = [
   { id: 'index.html', html: indexHtml },
   ...works.map(work => ({ id: work.id, html: fs.readFileSync(path.join(root, 'stories', work.file), 'utf8') })),
+  ...Object.entries(seriesPages).map(([name, file]) => ({ id: name, html: fs.readFileSync(path.join(root, 'series', file), 'utf8') })),
 ];
 for (const page of publicPages) {
   const ogImage = page.html.match(/<meta\s+property=["']og:image["']\s+content=["']([^"']+)["']/i)?.[1] || '';
@@ -114,9 +131,10 @@ const report = [
   '# 境界夜話 検索流入・404・フィード・SNS共有監査',
   '',
   `- 公開作品: ${works.length}話`,
+  `- 専用シリーズページ: ${expectedSeriesUrls.size}ページ`,
   `- 静的作品リンク: ${staticStoryPaths.size}件`,
   `- 静的シリーズ棚: ${Object.keys(seriesInfo).length}件`,
-  `- sitemap URL: ${works.length + 1}件`,
+  `- sitemap URL: ${sitemapUrls.length}件`,
   `- RSS項目: ${feedItems.length}件`,
   `- SNS共有画像設定ページ: ${publicPages.length}件`,
   `- エラー: ${errors.length}`,
