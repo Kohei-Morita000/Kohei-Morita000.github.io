@@ -10,11 +10,11 @@ const works = context.window.KYOKAI_WORKS || [];
 const errors = [];
 const rows = [];
 
-const seriesAnchors = {
-  '真壁夜話': 'series-makabe',
-  '黒瀬蒐集録': 'series-kurose',
-  '榊家異聞': 'series-sakaki',
-  '境界観測記': 'series-kansoku',
+const seriesPages = {
+  '真壁夜話': 'makabe.html',
+  '黒瀬蒐集録': 'kurose.html',
+  '榊家異聞': 'sakaki.html',
+  '境界観測記': 'kansoku.html',
 };
 const storyHref = work => `/kyokai-yawa/stories/${encodeURIComponent(work.file).replace(/%2F/gi, '/')}`;
 
@@ -37,9 +37,10 @@ for (const work of works) {
   const index = group.findIndex(item => item.id === work.id);
   const previous = index > 0 ? group[index - 1] : null;
   const next = index >= 0 && index < group.length - 1 ? group[index + 1] : null;
+  const seriesPage = seriesPages[work.series];
   const expectedHrefs = [
     previous ? storyHref(previous) : null,
-    `/kyokai-yawa/#${seriesAnchors[work.series]}`,
+    seriesPage ? `/kyokai-yawa/series/${seriesPage}` : null,
     next ? storyHref(next) : null,
   ].filter(Boolean);
 
@@ -60,19 +61,24 @@ for (const work of works) {
     series: work.series,
     previous: previous?.id || '第1話',
     next: next?.id || '最終話',
+    seriesPage: seriesPage || '未定義',
     staticLinks: actualHrefs.length,
   });
 }
 
 const navScript = path.join(root, 'data', 'story-nav.js');
 if (!fs.existsSync(navScript)) errors.push('data/story-nav.jsが存在しません');
+for (const page of Object.values(seriesPages)) {
+  if (!fs.existsSync(path.join(root, 'series', page))) errors.push(`series/${page}が存在しません`);
+}
 
 const report = [
   '# 境界夜話 作品ページ導線監査',
   '',
   `- 対象: ${works.length}話`,
+  `- 専用シリーズページ: ${Object.keys(seriesPages).length}ページ`,
   `- エラー: ${errors.length}`,
-  '- 静的HTML: 同一シリーズ内の前話／シリーズ一覧／次話',
+  '- 静的HTML: 同一シリーズ内の前話／専用シリーズページ／次話',
   '- JavaScript: 静的導線の表示を強化',
   '',
   '## エラー',
@@ -81,9 +87,9 @@ const report = [
   '',
   '## 前後関係',
   '',
-  '| ID | シリーズ | 前 | 次 | 静的リンク数 |',
-  '|---|---|---|---|---:|',
-  ...rows.map(row => `| ${row.id} | ${row.series} | ${row.previous} | ${row.next} | ${row.staticLinks} |`),
+  '| ID | シリーズ | 前 | 次 | シリーズページ | 静的リンク数 |',
+  '|---|---|---|---|---|---:|',
+  ...rows.map(row => `| ${row.id} | ${row.series} | ${row.previous} | ${row.next} | ${row.seriesPage} | ${row.staticLinks} |`),
   '',
 ].join('\n');
 
