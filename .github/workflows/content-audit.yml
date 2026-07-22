@@ -9,7 +9,7 @@ on:
       - 'data/works.js'
       - 'data/story-nav.js'
       - 'data/archive-tools.js'
-      - 'data/works-skk011.js'
+      - 'data/story-style-*.css'
       - 'sitemap.xml'
       - 'scripts/audit-stories.mjs'
       - 'scripts/audit-length-categories.mjs'
@@ -22,6 +22,7 @@ on:
       - 'scripts/normalize-fear-levels.mjs'
       - 'scripts/normalize-html-basics.mjs'
       - 'scripts/normalize-public-assets.mjs'
+      - 'scripts/normalize-shared-story-css.mjs'
       - '.github/workflows/content-audit.yml'
   workflow_dispatch:
 
@@ -54,6 +55,9 @@ jobs:
 
       - name: Normalize HTML anchors and accessibility
         run: node scripts/normalize-html-basics.mjs
+
+      - name: Extract completely shared story CSS
+        run: node scripts/normalize-shared-story-css.mjs
 
       - name: Audit story metadata and cross-story repetition
         id: content_audit
