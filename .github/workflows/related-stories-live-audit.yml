@@ -1,0 +1,56 @@
+name: Related Stories Production Audit
+
+on:
+  push:
+    paths:
+      - 'stories/**'
+      - 'data/related-stories.css'
+      - 'data/story-taxonomy.json'
+      - 'scripts/audit-live-related-stories.mjs'
+      - '.github/workflows/related-stories-live-audit.yml'
+  workflow_dispatch:
+
+concurrency:
+  group: related-stories-live-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: write
+
+jobs:
+  audit-production:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Wait for GitHub Pages deployment
+        run: sleep 60
+
+      - name: Audit production story tags and related links
+        id: live_related_audit
+        continue-on-error: true
+        run: node scripts/audit-live-related-stories.mjs
+
+      - name: Commit production audit report
+        if: always()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add reports/live-related-stories-audit.md
+          if git diff --cached --quiet; then
+            echo "Production related story report is unchanged."
+          else
+            git commit -m "chore: record related story production audit"
+            git pull --rebase origin main
+            git push
+          fi
+
+      - name: Fail when production audit errors exist
+        if: steps.live_related_audit.outcome == 'failure'
+        run: exit 1
