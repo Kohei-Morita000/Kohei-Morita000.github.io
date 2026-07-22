@@ -1,0 +1,76 @@
+name: Work Cards
+
+on:
+  push:
+    paths:
+      - 'index.html'
+      - 'stories/**'
+      - 'data/works.js'
+      - 'data/story-taxonomy.json'
+      - 'data/archive-tools.js'
+      - 'data/work-cards.css'
+      - 'scripts/normalize-discovery.mjs'
+      - 'scripts/normalize-related-stories.mjs'
+      - 'scripts/audit-work-cards.mjs'
+      - 'scripts/audit-related-stories.mjs'
+      - 'scripts/audit-discovery.mjs'
+      - '.github/workflows/work-cards-audit.yml'
+  workflow_dispatch:
+
+concurrency:
+  group: work-cards-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: write
+
+jobs:
+  normalize-and-audit:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Refresh story taxonomy and related links
+        run: node scripts/normalize-related-stories.mjs
+
+      - name: Generate comparable homepage story cards
+        run: node scripts/normalize-discovery.mjs
+
+      - name: Audit comparable homepage story cards
+        id: cards_audit
+        continue-on-error: true
+        run: node scripts/audit-work-cards.mjs
+
+      - name: Audit story taxonomy and related links
+        id: related_audit
+        continue-on-error: true
+        run: node scripts/audit-related-stories.mjs
+
+      - name: Audit homepage discovery metadata
+        id: discovery_audit
+        continue-on-error: true
+        run: node scripts/audit-discovery.mjs
+
+      - name: Commit generated cards and reports
+        if: always()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html feed.xml stories data/story-taxonomy.json reports/work-cards-audit.md reports/related-stories-audit.md reports/discovery-audit.md
+          if git diff --cached --quiet; then
+            echo "Story cards and audit reports are unchanged."
+          else
+            git commit -m "chore: publish comparable homepage story cards"
+            git pull --rebase origin main
+            git push
+          fi
+
+      - name: Fail when card audits contain errors
+        if: steps.cards_audit.outcome == 'failure' || steps.related_audit.outcome == 'failure' || steps.discovery_audit.outcome == 'failure'
+        run: exit 1
