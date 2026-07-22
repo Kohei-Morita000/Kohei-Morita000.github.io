@@ -1,17 +1,12 @@
 # 境界夜話 HTML・内部リンク・アクセシビリティ監査
 
 - 対象: 48話
-- エラー: 6
+- エラー: 0
 - 警告: 0
 
 ## エラー
 
-- index.html: #series-makabe が存在しません
-- index.html: #series-kurose が存在しません
-- index.html: #series-sakaki が存在しません
-- index.html: #series-kansoku が存在しません
-- KKS-S1E12: article#storyにtabindex=-1がありません
-- KKS-S1E12: 本文スキップリンクがありません
+- なし
 
 ## 警告
 
