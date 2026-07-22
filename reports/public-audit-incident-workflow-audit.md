@@ -1,6 +1,6 @@
 # 境界夜話 公開監査障害Issue通知 設定監査
 
-- 監視対象: Public Reading Browser Audit / Public Site Health Audit
+- 監視対象: Public Reading Browser Audit / Public Site Health Audit / Public Offline Browser Audit
 - 障害判定: failure・cancelled・timed_out・skipped等の非success
 - 通知方法: 監査ごとにGitHub Issueを1件だけ作成し、連続失敗は同じIssueへ追記
 - 復旧処理: 同じ監査の次回success時に復旧コメントを追加して自動クローズ
