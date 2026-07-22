@@ -1,0 +1,123 @@
+name: Public Audit Incident Notification
+
+on:
+  workflow_run:
+    workflows: ['Public Reading Browser Audit']
+    types: [completed]
+  push:
+    paths:
+      - '.github/workflows/public-audit-incident.yml'
+      - 'scripts/audit-public-audit-incident-workflow.mjs'
+  workflow_dispatch:
+
+concurrency:
+  group: public-audit-incident
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+  issues: write
+  actions: read
+
+jobs:
+  config-audit:
+    if: github.event_name != 'workflow_run'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Audit incident notification safeguards
+        id: config
+        continue-on-error: true
+        run: node scripts/audit-public-audit-incident-workflow.mjs
+      - name: Commit incident notification audit report
+        if: always()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add reports/public-audit-incident-workflow-audit.md
+          if git diff --cached --quiet; then
+            echo "Incident notification audit report is unchanged."
+          else
+            git commit -m "chore: record public audit incident notification audit"
+            git pull --rebase origin main
+            git push
+          fi
+      - name: Fail when notification safeguards are invalid
+        if: steps.config.outcome == 'failure'
+        run: exit 1
+
+  incident:
+    if: ${{ github.event_name == 'workflow_run' && github.event.workflow_run.head_repository.full_name == github.repository && github.event.workflow_run.head_branch == 'main' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Open update or close the public audit incident
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const run=context.payload.workflow_run;
+            const owner=context.repo.owner;
+            const repo=context.repo.repo;
+            const title='[監視] 境界夜話 公開サイト監査失敗';
+            const label='site-monitoring';
+            const marker='<!-- kyokai-public-audit-incident -->';
+            const jst=new Date().toLocaleString('ja-JP',{timeZone:'Asia/Tokyo',hour12:false});
+            const runLink=`[Actions実行 #${run.run_number}](${run.html_url})`;
+
+            const issues=await github.paginate(github.rest.issues.listForRepo,{owner,repo,state:'open',per_page:100});
+            const incident=issues.find(issue=>!issue.pull_request&&issue.title===title);
+
+            if(run.conclusion!=='success'){
+              try{
+                await github.rest.issues.getLabel({owner,repo,name:label});
+              }catch(error){
+                if(error.status!==404)throw error;
+                await github.rest.issues.createLabel({owner,repo,name:label,color:'d73a4a',description:'公開サイトの自動監査で検出した障害'});
+              }
+
+              const details=[
+                marker,
+                '公開サイトの定期実ブラウザー監査が正常完了しませんでした。',
+                '',
+                `- 結果: **${run.conclusion}**`,
+                `- 実行: ${runLink}`,
+                `- 対象コミット: \`${run.head_sha}\``,
+                `- 起動イベント: \`${run.event}\``,
+                `- 確認時刻: ${jst} JST`,
+                '',
+                'Actions実行ページのHTMLレポート、trace、screenshot、videoを確認してください。失敗資料は14日間保存されます。',
+              ].join('\n');
+
+              if(incident){
+                await github.rest.issues.createComment({owner,repo,issue_number:incident.number,body:`監査が再び正常完了しませんでした。\n\n${details}`});
+                core.notice(`既存の障害Issue #${incident.number}へ追記しました。`);
+              }else{
+                const created=await github.rest.issues.create({owner,repo,title,body:details,labels:[label]});
+                core.notice(`障害Issue #${created.data.number}を作成しました。`);
+              }
+            }else if(incident){
+              await github.rest.issues.createComment({
+                owner,
+                repo,
+                issue_number:incident.number,
+                body:[
+                  '公開サイト監査が正常へ復旧しました。',
+                  '',
+                  `- 実行: ${runLink}`,
+                  `- 対象コミット: \`${run.head_sha}\``,
+                  `- 復旧確認時刻: ${jst} JST`,
+                  '',
+                  'このIssueを自動でクローズします。',
+                ].join('\n'),
+              });
+              await github.rest.issues.update({owner,repo,issue_number:incident.number,state:'closed'});
+              core.notice(`障害Issue #${incident.number}を復旧としてクローズしました。`);
+            }else{
+              core.info('公開サイト監査は正常です。未解決の監視Issueはありません。');
+            }
