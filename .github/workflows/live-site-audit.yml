@@ -5,6 +5,9 @@ on:
     paths:
       - 'index.html'
       - '404.html'
+      - 'offline.html'
+      - 'service-worker.js'
+      - 'manifest.webmanifest'
       - 'robots.txt'
       - 'sitemap.xml'
       - 'feed.xml'
@@ -12,6 +15,7 @@ on:
       - 'data/**'
       - 'assets/**'
       - 'scripts/audit-live-site.mjs'
+      - 'scripts/audit-live-offline.mjs'
       - '.github/workflows/live-site-audit.yml'
   schedule:
     - cron: '17 18 * * *'
@@ -42,7 +46,7 @@ jobs:
           success=0
           for attempt in $(seq 1 30); do
             echo "Production audit attempt ${attempt}/30"
-            if node scripts/audit-live-site.mjs; then
+            if node scripts/audit-live-site.mjs && node scripts/audit-live-offline.mjs; then
               success=1
               break
             fi
@@ -53,22 +57,22 @@ jobs:
             exit 1
           fi
 
-      - name: Upload production audit report
+      - name: Upload production audit reports
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: live-site-audit-report
-          path: reports/live-site-audit.md
+          name: live-site-audit-reports
+          path: reports/live-*.md
           if-no-files-found: error
 
-      - name: Commit production audit report
+      - name: Commit production audit reports
         if: always()
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add reports/live-site-audit.md
+          git add reports/live-site-audit.md reports/live-offline-audit.md
           if git diff --cached --quiet; then
-            echo "Production audit report is unchanged."
+            echo "Production audit reports are unchanged."
           else
             git commit -m "chore: record production live site audit"
             git pull --rebase origin main
