@@ -30,9 +30,6 @@
     :root{color-scheme:dark;--bg:#080808;--ink:#f3ecdf;--muted:#b8afa0;--dim:#81786c;--line:#34302a;--soft:#24211d;--accent:#8f2630;--gold:#c9a867;font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:var(--bg);color:var(--ink)}
     *{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;min-height:100dvh;background:linear-gradient(90deg,rgba(255,255,255,.024) 1px,transparent 1px) 0 0/44px 44px,linear-gradient(0deg,rgba(255,255,255,.017) 1px,transparent 1px) 0 0/44px 44px,linear-gradient(180deg,#0a0a09,#11100e 58%,#080808);color:var(--ink)}a{color:inherit}.skip{position:absolute;left:16px;top:-80px;background:var(--ink);color:#0b0b0b;padding:10px 14px;z-index:10}.skip:focus{top:16px}header{border-bottom:1px solid var(--soft);background:rgba(8,8,8,.88);position:sticky;top:0;z-index:5;backdrop-filter:blur(14px)}.nav{width:min(960px,calc(100% - 40px));min-height:64px;margin:auto;display:flex;align-items:center;justify-content:space-between;gap:18px}.brand{display:flex;align-items:baseline;gap:12px;text-decoration:none}.brand strong{font-family:Georgia,"Yu Mincho","Hiragino Mincho ProN",serif;font-size:1.2rem;font-weight:600}.brand span,.back{color:var(--muted);font-size:.9rem}.back{text-decoration:none;border:1px solid var(--line);padding:8px 11px;background:#0e0d0c}main{width:min(880px,calc(100% - 40px));margin:0 auto;padding:58px 0 80px}.kicker{color:var(--gold);letter-spacing:.08em;font-size:.86rem;margin:0 0 14px}h1{font-family:Georgia,"Yu Mincho","Hiragino Mincho ProN",serif;font-size:clamp(2.35rem,7vw,4.25rem);font-weight:500;line-height:1.15;margin:0 0 20px}.summary{font-family:Georgia,"Yu Mincho","Hiragino Mincho ProN",serif;color:#ded5c8;font-size:1.05rem;line-height:2;margin:0;max-width:760px}.meta{display:flex;flex-wrap:wrap;gap:9px;margin:26px 0 42px}.meta span{border:1px solid var(--line);background:#11100e;color:var(--muted);padding:7px 10px;font-size:.86rem}article{border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:42px 0}article p{font-family:Georgia,"Yu Mincho","Hiragino Mincho ProN",serif;font-size:1.06rem;line-height:2.18;letter-spacing:.02em;margin:0 0 1.35em}article p:last-child{margin-bottom:0}.song{padding-left:1.4em;border-left:2px solid #5a4a36;color:#e0d3ba}.notice{margin-top:28px;border-left:3px solid var(--accent);background:#11100e;padding:18px 20px;color:var(--muted);line-height:1.8;font-size:.9rem}.footer-nav{display:flex;justify-content:space-between;gap:16px;align-items:center;margin-top:34px}.footer-nav a{text-decoration:none;border:1px solid var(--line);padding:11px 14px;background:#11100e}footer{border-top:1px solid var(--soft);padding:30px 20px;color:var(--dim);text-align:center;font-size:.88rem}:focus-visible{outline:3px solid var(--gold);outline-offset:4px}@media(max-width:600px){.nav{width:min(100% - 28px,960px);align-items:flex-start;flex-direction:column;padding:13px 0}main{width:min(100% - 28px,880px);padding-top:38px}article{padding:30px 0}article p{font-size:1rem;line-height:2.05}.footer-nav{align-items:stretch;flex-direction:column}}
   </style>
-<!-- READING_STATUS_STYLES_START -->
-<link rel="stylesheet" href="/kyokai-yawa/data/reading-status.css">
-<!-- READING_STATUS_STYLES_END -->
 <!-- STORY_OVERVIEW_STYLES_START -->
 <link rel="stylesheet" href="/kyokai-yawa/data/story-overview.css">
 <!-- STORY_OVERVIEW_STYLES_END -->
@@ -42,6 +39,9 @@
 <!-- RELATED_STYLES_START -->
 <link rel="stylesheet" href="/kyokai-yawa/data/related-stories.css">
 <!-- RELATED_STYLES_END -->
+<!-- READING_STATUS_STYLES_START -->
+<link rel="stylesheet" href="/kyokai-yawa/data/reading-status.css">
+<!-- READING_STATUS_STYLES_END -->
 </head>
 <body data-story-id="SKK-010">
   <a class="skip" href="#story">本文へ移動</a>
@@ -214,9 +214,11 @@
 <!-- RELATED_STORIES_END -->
     <nav class="footer-nav" aria-label="榊家異聞の前後話"><a class="story-nav-link previous" href="/kyokai-yawa/stories/skk-009-chichi-ga-wasureta-tanjobi.html"><span>前の話</span><strong>父が忘れた誕生日</strong></a><a class="story-nav-link series-index" href="/kyokai-yawa/series/sakaki.html"><span>シリーズ一覧</span><strong>榊家異聞</strong></a><a class="story-nav-link next" href="/kyokai-yawa/stories/skk-011-genkan-ni-oku-kutsu.html"><span>次の話</span><strong>玄関に置く靴</strong></a></nav>
   </main>
-  <footer>© 境界夜話｜編集長プロジェクト</footer><!-- READING_STATUS_SCRIPT_START -->
+  <footer>© 境界夜話｜編集長プロジェクト</footer>
+<!-- READING_STATUS_SCRIPT_START -->
 <script src="/kyokai-yawa/data/reading-status.js" defer></script>
-<!-- READING_STATUS_SCRIPT_END --><!-- READER_SCRIPT_START -->
+<!-- READING_STATUS_SCRIPT_END -->
+<!-- READER_SCRIPT_START -->
 <script src="/kyokai-yawa/data/reader-tools.js" defer></script>
 <!-- READER_SCRIPT_END -->
 <!-- SW_REGISTER_START -->
