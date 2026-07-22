@@ -1,0 +1,56 @@
+name: Related Stories Audit
+
+on:
+  push:
+    paths:
+      - 'data/works.js'
+      - 'data/related-stories.css'
+      - 'scripts/normalize-related-stories.mjs'
+      - 'scripts/audit-related-stories.mjs'
+      - '.github/workflows/related-stories-audit.yml'
+  workflow_dispatch:
+
+concurrency:
+  group: related-stories-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: write
+
+jobs:
+  normalize-and-audit:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Generate story taxonomy and related links
+        run: node scripts/normalize-related-stories.mjs
+
+      - name: Audit story taxonomy and related links
+        id: related_audit
+        continue-on-error: true
+        run: node scripts/audit-related-stories.mjs
+
+      - name: Commit generated story discovery and report
+        if: always()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add stories data/story-taxonomy.json reports/related-stories-audit.md
+          if git diff --cached --quiet; then
+            echo "Related story discovery and report are unchanged."
+          else
+            git commit -m "chore: publish story taxonomy and related links"
+            git pull --rebase origin main
+            git push
+          fi
+
+      - name: Fail when related story audit errors exist
+        if: steps.related_audit.outcome == 'failure'
+        run: exit 1
