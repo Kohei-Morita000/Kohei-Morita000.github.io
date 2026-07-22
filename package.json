@@ -7,7 +7,8 @@
     "test:e2e": "playwright test",
     "test:e2e:chromium": "playwright test --project=chromium-desktop",
     "test:e2e:mobile": "playwright test --project=webkit-mobile",
-    "test:health": "playwright test tests/site-health.spec.mjs"
+    "test:health": "playwright test tests/site-health.spec.mjs",
+    "test:offline": "playwright test --config=playwright.offline.config.mjs"
   },
   "devDependencies": {
     "@axe-core/playwright": "4.10.2",
