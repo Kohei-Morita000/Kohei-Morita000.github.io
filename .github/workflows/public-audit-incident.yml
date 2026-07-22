@@ -2,7 +2,9 @@ name: Public Audit Incident Notification
 
 on:
   workflow_run:
-    workflows: ['Public Reading Browser Audit']
+    workflows:
+      - 'Public Reading Browser Audit'
+      - 'Public Site Health Audit'
     types: [completed]
   push:
     paths:
@@ -64,7 +66,7 @@ jobs:
             const run=context.payload.workflow_run;
             const owner=context.repo.owner;
             const repo=context.repo.repo;
-            const title='[監視] 境界夜話 公開サイト監査失敗';
+            const title=`[監視] 境界夜話 ${run.name} 失敗`;
             const label='site-monitoring';
             const marker='<!-- kyokai-public-audit-incident -->';
             const jst=new Date().toLocaleString('ja-JP',{timeZone:'Asia/Tokyo',hour12:false});
@@ -83,7 +85,7 @@ jobs:
 
               const details=[
                 marker,
-                '公開サイトの定期実ブラウザー監査が正常完了しませんでした。',
+                `公開サイト監査「${run.name}」が正常完了しませんでした。`,
                 '',
                 `- 結果: **${run.conclusion}**`,
                 `- 実行: ${runLink}`,
@@ -107,7 +109,7 @@ jobs:
                 repo,
                 issue_number:incident.number,
                 body:[
-                  '公開サイト監査が正常へ復旧しました。',
+                  `公開サイト監査「${run.name}」が正常へ復旧しました。`,
                   '',
                   `- 実行: ${runLink}`,
                   `- 対象コミット: \`${run.head_sha}\``,
@@ -119,5 +121,5 @@ jobs:
               await github.rest.issues.update({owner,repo,issue_number:incident.number,state:'closed'});
               core.notice(`障害Issue #${incident.number}を復旧としてクローズしました。`);
             }else{
-              core.info('公開サイト監査は正常です。未解決の監視Issueはありません。');
+              core.info(`${run.name}は正常です。未解決の監視Issueはありません。`);
             }
