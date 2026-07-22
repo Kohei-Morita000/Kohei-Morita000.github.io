@@ -1,7 +1,7 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512" role="img" aria-labelledby="title desc">
   <title id="title">境界夜話 アイコン</title>
   <desc id="desc">暗い背景に、境界を表す扉と赤い隙間を描いた図案</desc>
-  <rect width="512" height="512" rx="72" fill="#090b10"/>
+  <rect width="512" height="512" fill="#090b10"/>
   <rect x="38" y="38" width="436" height="436" rx="52" fill="none" stroke="#8c764c" stroke-width="8"/>
   <path d="M154 404V108c0-12 10-22 22-22h160c12 0 22 10 22 22v296" fill="#140a0d" stroke="#c7a76a" stroke-width="10" stroke-linejoin="round"/>
   <rect x="190" y="126" width="132" height="278" rx="10" fill="#240c12" stroke="#6f1e2a" stroke-width="6"/>
