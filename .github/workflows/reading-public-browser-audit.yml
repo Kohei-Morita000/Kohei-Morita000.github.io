@@ -23,10 +23,12 @@ on:
       - 'tests/site-health.spec.mjs'
       - 'scripts/normalize-reading-log.mjs'
       - 'scripts/normalize-series-pages.mjs'
+      - 'scripts/normalize-accessibility-contrast.mjs'
       - 'scripts/reading-browser-reporter.mjs'
       - 'scripts/site-health-reporter.mjs'
       - 'scripts/audit-reading-public-browser-workflow.mjs'
       - 'scripts/audit-site-health-workflow.mjs'
+      - 'scripts/audit-accessibility-contrast-assets.mjs'
       - '.github/workflows/reading-public-browser-audit.yml'
   workflow_dispatch:
 
@@ -56,6 +58,8 @@ jobs:
         run: node scripts/audit-reading-public-browser-workflow.mjs
       - name: Audit accessibility and runtime safeguards
         run: node scripts/audit-site-health-workflow.mjs
+      - name: Audit shared contrast stylesheet references
+        run: node scripts/audit-accessibility-contrast-assets.mjs
       - name: Wait for GitHub Pages deployment
         if: github.event_name != 'schedule'
         run: sleep 60
@@ -83,6 +87,7 @@ jobs:
             reports/reading-public-browser-audit.md
             reports/site-health-workflow-audit.md
             reports/site-public-health-audit.md
+            reports/accessibility-contrast-assets-audit.md
             playwright-report
             test-results
           if-no-files-found: warn
@@ -92,7 +97,7 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add reports/reading-public-browser-workflow-audit.md reports/reading-public-browser-audit.md reports/site-health-workflow-audit.md
+          git add reports/reading-public-browser-workflow-audit.md reports/reading-public-browser-audit.md reports/site-health-workflow-audit.md reports/accessibility-contrast-assets-audit.md
           if [ -f reports/site-public-health-audit.md ]; then git add reports/site-public-health-audit.md; fi
           if git diff --cached --quiet; then
             echo "Public browser audit reports are unchanged."
