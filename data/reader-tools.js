@@ -49,7 +49,8 @@
       <span class="reader-progress-text" aria-live="polite">本文 0%</span>
       <button class="reader-resume-button" type="button" hidden>前回の位置へ</button>
     </div>`;
-  meta.after(toolbar);
+  const overview = document.querySelector('.story-overview');
+  (overview || meta).after(toolbar);
 
   const sizeButtons = [...toolbar.querySelectorAll('[data-reader-size]')];
   const progressText = toolbar.querySelector('.reader-progress-text');
