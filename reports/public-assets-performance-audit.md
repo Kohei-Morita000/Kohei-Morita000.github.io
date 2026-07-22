@@ -1,8 +1,8 @@
 # 境界夜話 公開資産・表示速度監査
 
 - HTML対象: 49ページ
-- エラー: 2
-- 警告: 2
+- エラー: 0
+- 警告: 1
 - HTML合計: 770.9KiB（gzip 311.6KiB）
 - 最大HTML: stories/kks-s1e05-amayadori-no-junban.html 22.8KiB
 - 最大gzip: stories/kks-s1e05-amayadori-no-junban.html 8.9KiB
@@ -10,19 +10,17 @@
 
 ## エラー
 
-- index.html: 参照先 stories/${esc(w.file)} が存在しません
-- index.html: 参照先 stories/${esc(w.file)} が存在しません
+- なし
 
 ## 警告
 
-- index.html: 同じ公開資産を重複読み込みしています
 - 未参照の公開資産: data/works-skk011.js
 
 ## ページ別容量
 
 | ページ | HTML | gzip | inline CSS | inline JS | 公開資産リクエスト |
 |---|---:|---:|---:|---:|---:|
-| index.html | 12.4KiB | 4.4KiB | 6.9KiB | 1.3KiB | 3 |
+| index.html | 12.4KiB | 4.4KiB | 6.9KiB | 1.3KiB | 2 |
 | stories/kks-s1e01-sakaime-no-heya.html | 21.0KiB | 8.0KiB | 3.1KiB | 0.0KiB | 2 |
 | stories/kks-s1e02-kieta-fumikiri-oto.html | 20.7KiB | 7.9KiB | 3.1KiB | 0.0KiB | 2 |
 | stories/kks-s1e03-henji-o-suru-kuseki.html | 19.2KiB | 7.7KiB | 3.1KiB | 0.0KiB | 2 |
@@ -126,4 +124,3 @@
 - data/archive-tools.js
 - data/story-nav.js
 - data/works.js
-- stories/${esc(w.file)}
