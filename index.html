@@ -32,12 +32,31 @@
 <!-- WORK_CARD_STYLES_START -->
 <link rel="stylesheet" href="/kyokai-yawa/data/work-cards.css">
 <!-- WORK_CARD_STYLES_END -->
+<!-- HOME_PERSONALIZATION_STYLES_START -->
+<link rel="stylesheet" href="/kyokai-yawa/data/home-personalization.css">
+<!-- HOME_PERSONALIZATION_STYLES_END -->
 </head>
 <body>
 <a class="skip" href="#main">本文へ移動</a>
 <header class="site-header"><div class="wrap nav"><a class="brand" href="/kyokai-yawa/" aria-label="境界夜話トップ"><strong>境界夜話</strong><span>怪談アーカイブ</span></a><nav class="nav-links" aria-label="主要メニュー"><a href="#start">初めての方</a><a href="#discover">選び方</a><a href="#works">作品</a><a href="#series">シリーズ</a></nav></div></header>
 <main id="main">
 <section class="hero" aria-labelledby="hero-title"><div class="wrap hero-grid"><div><p class="eyebrow">Kyokai Yawa</p><h1 id="hero-title">記録の向こうから、<br>声がする。</h1><p class="lead">真壁夜話、黒瀬蒐集録、榊家異聞、境界観測記。家、土地、記録、境界に残る夜の話を集めた連作怪談アーカイブです。</p><div class="actions"><a class="btn primary" href="#works">作品を読む</a><a class="btn" href="#series">シリーズを見る</a></div></div><div class="archive-panel" aria-label="四つのシリーズを収めた記録棚"><div class="shelf"><div class="seal">境界夜話</div><div class="slips"><a class="slip" href="#series-makabe"><b>真壁夜話</b><span>日常の端に残った、短い記録。</span></a><a class="slip" href="#series-kurose"><b>黒瀬蒐集録</b><span>土地と民俗に沈む、説明のつかない痕跡。</span></a><a class="slip" href="#series-sakaki"><b>榊家異聞</b><span>家族の記憶に紛れた、いないはずの誰か。</span></a><a class="slip" href="#series-kansoku"><b>境界観測記</b><span>こちら側と向こう側が重なる場所。</span></a></div></div></div></div></section>
+<!-- HOME_PERSONALIZATION_START -->
+<section class="section personal-library" id="your-library" data-personal-library hidden aria-labelledby="personal-library-title">
+  <div class="wrap">
+    <div class="section-head">
+      <div><p class="eyebrow">YOUR NIGHT ARCHIVE</p><h2 id="personal-library-title">続きの一話を選ぶ</h2></div>
+      <p class="personal-library-note">この端末に保存された途中位置と読了履歴から表示します。履歴は外部へ送信されません。</p>
+    </div>
+    <div class="personal-library-grid">
+      <article class="personal-panel" data-personal-continue hidden><p class="personal-panel-kicker">CONTINUE</p><h3>続きから読む</h3><div class="personal-story-list" data-personal-list></div></article>
+      <article class="personal-panel" data-personal-recent hidden><p class="personal-panel-kicker">RECENT</p><h3>最近読んだ作品</h3><div class="personal-story-list" data-personal-list></div></article>
+      <article class="personal-panel" data-personal-recommend hidden><p class="personal-panel-kicker">UNREAD PICKS</p><h3>未読のおすすめ</h3><div class="personal-story-list" data-personal-list></div></article>
+    </div>
+    <p class="personal-local-note">読了状態や途中位置はブラウザーの保存データを削除すると消去されます。</p>
+  </div>
+</section>
+<!-- HOME_PERSONALIZATION_END -->
 <!-- ENTRY_GUIDE_START -->
 <section class="section entry-guide" id="start" aria-labelledby="entry-guide-title">
   <div class="wrap">
@@ -123,6 +142,9 @@
 <!-- READING_STATUS_SCRIPT_START -->
 <script src="/kyokai-yawa/data/reading-status.js" defer></script>
 <!-- READING_STATUS_SCRIPT_END -->
+<!-- HOME_PERSONALIZATION_SCRIPT_START -->
+<script src="/kyokai-yawa/data/home-personalization.js" defer></script>
+<!-- HOME_PERSONALIZATION_SCRIPT_END -->
 <script src="/kyokai-yawa/data/archive-tools.js"></script>
 <script src="/kyokai-yawa/data/series-links.js" defer></script>
 <!-- SW_REGISTER_START -->
