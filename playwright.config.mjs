@@ -8,6 +8,16 @@ const webServer=publicBaseURL?undefined:{
   reuseExistingServer:!process.env.CI,
   timeout:120_000,
 };
+const siteHealthMode=Boolean(process.env.SITE_HEALTH_REPORT?.trim());
+const reporter=siteHealthMode?[
+  ['line'],
+  ['html',{open:'never',outputFolder:'playwright-report'}],
+  ['./scripts/site-health-reporter.mjs'],
+]:[
+  ['line'],
+  ['html',{open:'never',outputFolder:'playwright-report'}],
+  ['./scripts/reading-browser-reporter.mjs'],
+];
 
 export default defineConfig({
   testDir:'./tests',
@@ -18,11 +28,7 @@ export default defineConfig({
   retries:process.env.CI?1:0,
   workers:process.env.CI?1:undefined,
   outputDir:'test-results',
-  reporter:[
-    ['line'],
-    ['html',{open:'never',outputFolder:'playwright-report'}],
-    ['./scripts/reading-browser-reporter.mjs'],
-  ],
+  reporter,
   use:{
     baseURL,
     serviceWorkers:'block',
