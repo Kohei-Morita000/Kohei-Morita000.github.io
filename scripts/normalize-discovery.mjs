@@ -8,10 +8,12 @@ const socialImage = `${base}assets/social-card.png`;
 const socialAlt = '境界夜話 四つの怪談アーカイブ';
 const indexPath = path.join(root, 'index.html');
 const worksPath = path.join(root, 'data', 'works.js');
+const taxonomyPath = path.join(root, 'data', 'story-taxonomy.json');
 const context = { window: {} };
 vm.runInNewContext(fs.readFileSync(worksPath, 'utf8'), context, { filename: worksPath });
 const works = context.window.KYOKAI_WORKS || [];
 const seriesInfo = context.window.KYOKAI_SERIES || {};
+const taxonomy = fs.existsSync(taxonomyPath) ? JSON.parse(fs.readFileSync(taxonomyPath, 'utf8')) : {};
 const escapeXml = value => String(value ?? '')
   .replaceAll('&', '&amp;')
   .replaceAll('<', '&lt;')
@@ -118,9 +120,25 @@ if (!indexHtml.includes('type="application/rss+xml"')) {
   indexHtml = indexHtml.replace('</head>', `${feedLink}\n</head>`);
 }
 
+const workCardStyle = '<!-- WORK_CARD_STYLES_START -->\n<link rel="stylesheet" href="/kyokai-yawa/data/work-cards.css">\n<!-- WORK_CARD_STYLES_END -->';
+indexHtml = indexHtml
+  .replace(/\s*<!-- WORK_CARD_STYLES_START -->[\s\S]*?<!-- WORK_CARD_STYLES_END -->/g, '')
+  .replace(/\s*<link\s+rel=["']stylesheet["']\s+href=["']\/kyokai-yawa\/data\/work-cards\.css["'][^>]*>/gi, '');
+indexHtml = indexHtml.replace('</head>', `${workCardStyle}\n</head>`);
+
 const worksStart = '<!-- STATIC_WORKS_START -->';
 const worksEnd = '<!-- STATIC_WORKS_END -->';
-const staticWorks = entries.map(entry => `<a class="work-card" href="/kyokai-yawa/stories/${escapeHtml(entry.file)}"><div><span class="id">${escapeHtml(entry.id)} · ${escapeHtml(entry.series)}</span><h3>${escapeHtml(entry.title)}</h3><p>${escapeHtml(entry.desc)}</p></div><div class="work-meta"><span class="tag">${escapeHtml(entry.length)}</span><span class="tag">${escapeHtml(entry.mins)}</span><span class="tag">恐怖 ${escapeHtml(entry.fear)}</span></div></a>`).join('');
+const staticWorks = entries.map(entry => {
+  const info = taxonomy[entry.id] || {};
+  const tags = Array.isArray(info.tags) ? info.tags.slice(0, 4) : [];
+  const isSerial = entry.series === '境界観測記';
+  const formatKey = isSerial ? 'serial' : 'standalone';
+  const formatLabel = isSerial ? '連作・順番推奨' : '一話完結';
+  const fear = Math.min(5, Math.max(0, Number(entry.fear) || 0));
+  const fearDots = Array.from({ length: 5 }, (_, index) => `<i${index < fear ? ' class="is-filled"' : ''}></i>`).join('');
+  const searchText = [entry.id, entry.title, entry.desc, entry.series, formatLabel, ...tags].join(' ');
+  return `<a class="work-card" data-work-id="${escapeHtml(entry.id)}" data-format="${formatKey}" data-tags="${escapeHtml(tags.join(' '))}" data-search="${escapeHtml(searchText)}" href="/kyokai-yawa/stories/${escapeHtml(entry.file)}"><div class="work-card__body"><div class="work-card__head"><span class="id">${escapeHtml(entry.id)} · ${escapeHtml(entry.series)}</span><span class="work-format">${formatLabel}</span></div><h3>${escapeHtml(entry.title)}</h3><p>${escapeHtml(entry.desc)}</p><div class="work-topic-tags" aria-label="題材">${tags.map(tag => `<span class="work-topic-tag">${escapeHtml(tag)}</span>`).join('')}</div></div><div class="work-card__footer"><span class="work-stat"><span class="work-stat-label">読了目安</span><strong>${escapeHtml(entry.mins)}</strong></span><span class="work-stat"><span class="work-stat-label">恐怖度</span><span class="work-fear-row"><strong>${fear} / 5</strong><span class="work-fear-dots" aria-hidden="true">${fearDots}</span></span></span><span class="work-stat"><span class="work-stat-label">分量</span><span class="work-length">${escapeHtml(entry.length)}</span></span></div></a>`;
+}).join('');
 const staticWorksBlock = `${worksStart}${staticWorks}${worksEnd}`;
 if (indexHtml.includes(worksStart)) {
   indexHtml = indexHtml.replace(new RegExp(`${worksStart}[\\s\\S]*?${worksEnd}`), staticWorksBlock);
@@ -176,4 +194,4 @@ ${sorted.map(entry => `    <item>
 `;
 fs.writeFileSync(path.join(root, 'feed.xml'), rss);
 
-console.log(`# 検索・フィード・SNS共有正規化\n\n- 構造化作品一覧: ${entries.length}話\n- 静的作品リンク: ${entries.length}話\n- 静的シリーズ棚: ${Object.keys(seriesInfo).length}件\n- RSS項目: ${sorted.length}話\n- OGP・X共有画像: トップ＋${entries.length}話\n`);
+console.log(`# 検索・フィード・SNS共有正規化\n\n- 構造化作品一覧: ${entries.length}話\n- 比較可能な作品カード: ${entries.length}話\n- 題材タグ表示: ${entries.reduce((sum, entry) => sum + (taxonomy[entry.id]?.tags?.slice(0, 4).length || 0), 0)}件\n- 静的シリーズ棚: ${Object.keys(seriesInfo).length}件\n- RSS項目: ${sorted.length}話\n- OGP・X共有画像: トップ＋${entries.length}話\n`);
