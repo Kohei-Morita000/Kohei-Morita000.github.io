@@ -3,8 +3,8 @@
 - HTML対象: 49ページ
 - エラー: 0
 - 警告: 0
-- HTML合計: 645.9KiB（gzip 256.0KiB）
-- 最大HTML: stories/kks-s1e06-nijumaru-no-hyoshiki.html 20.3KiB
+- HTML合計: 655.2KiB（gzip 258.2KiB）
+- 最大HTML: index.html 21.6KiB
 - 最大gzip: stories/kks-s1e06-nijumaru-no-hyoshiki.html 8.0KiB
 - 完全一致CSSを共通化した場合の理論削減量: 0.0KiB
 
@@ -20,7 +20,7 @@
 
 | ページ | HTML | gzip | inline CSS | inline JS | 公開資産リクエスト |
 |---|---:|---:|---:|---:|---:|
-| index.html | 12.4KiB | 4.4KiB | 6.9KiB | 1.3KiB | 2 |
+| index.html | 21.6KiB | 6.6KiB | 6.9KiB | 1.3KiB | 2 |
 | stories/kks-s1e01-sakaime-no-heya.html | 18.0KiB | 6.6KiB | 0.0KiB | 0.0KiB | 3 |
 | stories/kks-s1e02-kieta-fumikiri-oto.html | 17.7KiB | 6.5KiB | 0.0KiB | 0.0KiB | 3 |
 | stories/kks-s1e03-henji-o-suru-kuseki.html | 16.2KiB | 6.3KiB | 0.0KiB | 0.0KiB | 3 |
