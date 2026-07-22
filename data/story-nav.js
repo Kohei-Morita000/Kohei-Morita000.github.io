@@ -15,12 +15,13 @@
     '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
   }[char]));
   const href=work=>`/kyokai-yawa/stories/${encodeURIComponent(work.file).replace(/%2F/gi,'/')}`;
-  const seriesAnchor={
-    '真壁夜話':'series-makabe',
-    '黒瀬蒐集録':'series-kurose',
-    '榊家異聞':'series-sakaki',
-    '境界観測記':'series-kansoku'
-  }[current.series]||'series';
+  const seriesPage={
+    '真壁夜話':'makabe.html',
+    '黒瀬蒐集録':'kurose.html',
+    '榊家異聞':'sakaki.html',
+    '境界観測記':'kansoku.html'
+  }[current.series];
+  if(!seriesPage)return;
 
   const previous=group[index-1];
   const next=group[index+1];
@@ -32,7 +33,7 @@
     : '<span class="story-nav-link disabled" aria-disabled="true"><span>次の話</span><strong>シリーズ最終話</strong></span>';
 
   nav.setAttribute('aria-label',`${current.series}の前後話`);
-  nav.innerHTML=`${previousHtml}<a class="story-nav-link series-index" href="/kyokai-yawa/#${seriesAnchor}"><span>シリーズ一覧</span><strong>${esc(current.series)}</strong></a>${nextHtml}`;
+  nav.innerHTML=`${previousHtml}<a class="story-nav-link series-index" href="/kyokai-yawa/series/${seriesPage}"><span>シリーズ一覧</span><strong>${esc(current.series)}</strong></a>${nextHtml}`;
 
   const style=document.createElement('style');
   style.textContent=`
