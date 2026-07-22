@@ -72,11 +72,13 @@ jobs:
             const marker='<!-- kyokai-public-audit-incident -->';
             const jst=new Date().toLocaleString('ja-JP',{timeZone:'Asia/Tokyo',hour12:false});
             const runLink=`[Actions実行 #${run.run_number}](${run.html_url})`;
+            const incidentConclusions=new Set(['failure','timed_out','action_required','startup_failure','stale']);
+            const isIncident=incidentConclusions.has(run.conclusion);
 
             const issues=await github.paginate(github.rest.issues.listForRepo,{owner,repo,state:'open',per_page:100});
             const incident=issues.find(issue=>!issue.pull_request&&issue.title===title);
 
-            if(run.conclusion!=='success'){
+            if(isIncident){
               try{
                 await github.rest.issues.getLabel({owner,repo,name:label});
               }catch(error){
@@ -104,7 +106,7 @@ jobs:
                 const created=await github.rest.issues.create({owner,repo,title,body:details,labels:[label]});
                 core.notice(`障害Issue #${created.data.number}を作成しました。`);
               }
-            }else if(incident){
+            }else if(run.conclusion==='success'&&incident){
               await github.rest.issues.createComment({
                 owner,
                 repo,
@@ -121,6 +123,8 @@ jobs:
               });
               await github.rest.issues.update({owner,repo,issue_number:incident.number,state:'closed'});
               core.notice(`障害Issue #${incident.number}を復旧としてクローズしました。`);
-            }else{
+            }else if(run.conclusion==='success'){
               core.info(`${run.name}は正常です。未解決の監視Issueはありません。`);
+            }else{
+              core.info(`${run.name}の結果${run.conclusion}は障害判定から除外しました。Issueは変更しません。`);
             }
