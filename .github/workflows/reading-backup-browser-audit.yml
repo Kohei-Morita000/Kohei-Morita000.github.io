@@ -5,9 +5,14 @@ on:
     paths:
       - 'package.json'
       - 'playwright.config.mjs'
+      - 'index.html'
       - 'reading-log.html'
+      - 'series/*.html'
       - 'stories/**.html'
       - 'data/works.js'
+      - 'data/archive-tools.js'
+      - 'data/series-archive-tools.js'
+      - 'data/home-personalization.js'
       - 'data/reading-status.js'
       - 'data/saved-stories.js'
       - 'data/reader-tools.js'
@@ -18,6 +23,7 @@ on:
       - 'scripts/reading-browser-reporter.mjs'
       - 'tests/reading-backup.spec.mjs'
       - 'tests/reading-state.spec.mjs'
+      - 'tests/reading-discovery.spec.mjs'
       - '.github/workflows/reading-backup-browser-audit.yml'
   workflow_dispatch:
 
