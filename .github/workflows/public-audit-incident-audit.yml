@@ -1,0 +1,44 @@
+name: Public Audit Incident Audit
+
+on:
+  push:
+    paths:
+      - 'scripts/public-audit-incident.mjs'
+      - 'scripts/test-public-audit-incident.mjs'
+      - 'scripts/audit-reading-public-browser-workflow.mjs'
+      - '.github/workflows/reading-public-browser-audit.yml'
+      - '.github/workflows/public-audit-incident-audit.yml'
+  workflow_dispatch:
+
+concurrency:
+  group: public-audit-incident-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: write
+
+jobs:
+  incident-audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Test incident issue lifecycle
+        run: node scripts/test-public-audit-incident.mjs
+      - name: Audit production workflow integration
+        run: node scripts/audit-reading-public-browser-workflow.mjs
+      - name: Commit incident audit reports
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add reports/public-audit-incident-audit.md reports/reading-public-browser-workflow-audit.md
+          if git diff --cached --quiet; then
+            echo "Incident audit reports are unchanged."
+          else
+            git commit -m "chore: record public audit incident notification audit"
+            git pull --rebase origin main
+            git push
+          fi
