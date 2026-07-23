@@ -26,7 +26,7 @@ permissions:
 jobs:
   focused-browser-audit:
     runs-on: ubuntu-latest
-    timeout-minutes: 12
+    timeout-minutes: 15
     env:
       PLAYWRIGHT_BASE_URL: https://allsunday1122.github.io/kyokai-yawa/
       READING_BROWSER_REPORT: home-personalization-public-browser-audit.md
@@ -37,6 +37,10 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
+      - name: Check personalization JavaScript syntax
+        run: node --check data/home-personalization.js
+      - name: Audit personalization static contract
+        run: node scripts/audit-home-personalization.mjs
       - name: Wait for GitHub Pages deployment
         run: sleep 60
       - name: Install browser test dependencies
@@ -54,6 +58,7 @@ jobs:
           name: home-personalization-public-browser-audit
           path: |
             reports/home-personalization-public-browser-audit.md
+            reports/home-personalization-audit.md
             playwright-report
             test-results
           if-no-files-found: warn
@@ -63,7 +68,7 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add reports/home-personalization-public-browser-audit.md
+          git add reports/home-personalization-public-browser-audit.md reports/home-personalization-audit.md
           if git diff --cached --quiet; then
             echo "Focused personalization report is unchanged."
           else
