@@ -10,19 +10,12 @@
 - 失敗資料: HTML・trace・screenshot・videoを14日保存
 - 障害通知: 初回失敗でIssue作成、連続失敗は追記、復旧時に自動クローズ
 - 重複防止: 固定タイトル・専用ラベル・本文マーカー
-- エラー: 8
+- エラー: 0
 - 警告: 0
 
 ## エラー
 
-- 障害Issue管理権限がありません
-- 障害Issueライフサイクル試験がありません
-- GitHub Issue操作がありません
-- 障害Issue管理処理がありません
-- 監査失敗判定の受け渡しがありません
-- 監査成果物がありません: reports/public-audit-incident-audit.md
-- 読書導線監査の変更監視がありません: scripts/public-audit-incident.mjs
-- 読書導線監査の変更監視がありません: scripts/test-public-audit-incident.mjs
+- なし
 
 ## 警告
 
