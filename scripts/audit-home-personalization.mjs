@@ -38,6 +38,7 @@ for(const token of ['kyokai-yawa-saved-stories-v1','getSavedIds','savedAt'])if(!
 for(const token of ["params.get('resume') === '1'",'resumeToSavedPosition','history.replaceState'])if(!readerTools.includes(token))errors.push(`途中位置への直接復帰処理がありません: ${token}`);
 for(const token of ['POSITION_PREFIX','data-personal-library','data-personal-continue','data-personal-recent','data-personal-saved','data-personal-recommend','story-taxonomy.json','selectRecommendations','status.getReadIds','status.getHistory','getSavedIds'])if(!personalization.includes(token))errors.push(`個別化処理がありません: ${token}`);
 if(!personalization.includes("fetch('/kyokai-yawa/data/story-taxonomy.json'"))errors.push('分類データ取得が同一サイトの絶対パスではありません');
+for(const token of ['AbortController','setTimeout(()=>controller.abort(),1200)','if(!continuePanel.hidden||!recentPanel.hidden','const reveal=()=>'])if(!personalization.includes(token))errors.push(`分類データ遅延時の先行表示処理がありません: ${token}`);
 if(/https?:\/\//.test(personalization))errors.push('個別化JavaScriptに外部URLが含まれています');
 for(const risky of ['sendBeacon','XMLHttpRequest','WebSocket'])if(personalization.includes(risky)||readingStatus.includes(risky)||savedStories.includes(risky))errors.push(`外部送信に使える処理が含まれています: ${risky}`);
 if(!css.includes('.personal-library[hidden]')||!css.includes('@media(max-width:620px)'))errors.push('非表示またはスマートフォン向けCSSが不足しています');
@@ -51,7 +52,7 @@ const simulate=id=>{
 };
 for(const work of works){const selected=simulate(work.id);if(selected.length!==3)errors.push(`${work.id}: 未読候補を3件選べません`);if(new Set(selected).size!==3||selected.includes(work.id))errors.push(`${work.id}: おすすめ候補に重複または自作品があります`);}
 
-const report=['# 境界夜話 再訪者向け個別入口監査','',`- 公開作品: ${works.length}/48`,'- 読み込み順: 作品データ → 読了管理 → 保存管理 → 個別化','- 続きから読む: 保存位置が8〜93％の作品から最新1話','- 最近読んだ作品: 閲覧・読了時刻順で最大3話','- あとで読む: 保存順で最大3話','- 未読のおすすめ: 題材・シリーズ・時間・恐怖度から最大3話','- 履歴・保存がない初回訪問: 非表示','- 途中位置リンク: `?resume=1`で保存位置へ移動','- 保存方式: ブラウザー端末内localStorage','- 外部送信: なし',`- エラー: ${errors.length}`,`- 警告: ${warnings.length}`,'','## エラー','',...(errors.length?errors.map(error=>`- ${error}`):['- なし']),'','## 警告','',...(warnings.length?warnings.map(error=>`- ${error}`):['- なし']),''].join('\n');
+const report=['# 境界夜話 再訪者向け個別入口監査','',`- 公開作品: ${works.length}/48`,'- 読み込み順: 作品データ → 読了管理 → 保存管理 → 個別化','- 続きから読む: 保存位置が8〜93％の作品から最新1話','- 最近読んだ作品: 閲覧・読了時刻順で最大3話','- あとで読む: 保存順で最大3話','- 未読のおすすめ: 題材・シリーズ・時間・恐怖度から最大3話','- 先行表示: 続き・履歴・保存は分類JSONを待たず表示','- 分類JSON待機上限: 1.2秒、超過時はシリーズ・時間・恐怖度で代替選定','- 履歴・保存がない初回訪問: 非表示','- 途中位置リンク: `?resume=1`で保存位置へ移動','- 保存方式: ブラウザー端末内localStorage','- 外部送信: なし',`- エラー: ${errors.length}`,`- 警告: ${warnings.length}`,'','## エラー','',...(errors.length?errors.map(error=>`- ${error}`):['- なし']),'','## 警告','',...(warnings.length?warnings.map(error=>`- ${error}`):['- なし']),''].join('\n');
 fs.mkdirSync(path.join(root,'reports'),{recursive:true});
 fs.writeFileSync(path.join(root,'reports','home-personalization-audit.md'),report);
 console.log(report);
