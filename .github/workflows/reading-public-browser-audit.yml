@@ -113,20 +113,29 @@ jobs:
         continue-on-error: true
         uses: actions/github-script@v7
         env:
-          AUDIT_FAILED: ${{ steps.tests.outcome != 'success' || steps.health.outcome != 'success' }}
+          AUDIT_FAILED: ${{ steps.tests.outcome == 'failure' || steps.health.outcome == 'failure' }}
+          AUDIT_RECOVERED: ${{ steps.tests.outcome == 'success' && steps.health.outcome == 'success' }}
           READING_OUTCOME: ${{ steps.tests.outcome }}
           HEALTH_OUTCOME: ${{ steps.health.outcome }}
         with:
           script: |
+            const readingOutcome = process.env.READING_OUTCOME || 'skipped';
+            const healthOutcome = process.env.HEALTH_OUTCOME || 'skipped';
+            const failed = process.env.AUDIT_FAILED === 'true';
+            const recovered = process.env.AUDIT_RECOVERED === 'true';
+            if (!failed && !recovered) {
+              core.info(`Public audit incident unchanged because the run was inconclusive: reading=${readingOutcome}, health=${healthOutcome}`);
+              return;
+            }
             const { pathToFileURL } = require('node:url');
             const moduleUrl = pathToFileURL('${{ github.workspace }}/scripts/public-audit-incident.mjs').href;
             const { managePublicAuditIncident } = await import(moduleUrl);
             const result = await managePublicAuditIncident({
               github,
               context,
-              failed: process.env.AUDIT_FAILED === 'true',
-              readingOutcome: process.env.READING_OUTCOME || 'skipped',
-              healthOutcome: process.env.HEALTH_OUTCOME || 'skipped',
+              failed,
+              readingOutcome,
+              healthOutcome,
             });
             core.info(`Public audit incident action: ${result.action}${result.issueNumber ? ` #${result.issueNumber}` : ''}`);
       - name: Commit public browser audit reports
