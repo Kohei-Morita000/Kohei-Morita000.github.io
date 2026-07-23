@@ -11,6 +11,8 @@ test('運用状況ページが最新4監査を正常表示する',async({page})=
   const data=await history.json();
   expect(data.version).toBe(1);
   expect(Array.isArray(data.entries)).toBeTruthy();
+  const kinds=new Set(data.entries.map(entry=>entry.kind));
+  expect([...kinds].sort()).toEqual(['incident-config','offline','reading','site-health']);
   await expect(page.locator('[data-status-grid] .status-card')).toHaveCount(4);
   await expect(page.locator('[data-status-overall]')).toHaveText('正常');
   await expect(page.locator('[data-status-message]')).toContainText('すべての公開監査が正常');
