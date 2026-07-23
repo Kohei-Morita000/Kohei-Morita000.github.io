@@ -36,7 +36,7 @@ class ReadingBrowserReporter{
       `- 実行日時: ${new Date().toISOString()}`,
       `- 実行対象: ${target}`,
       `- 実行環境: ${projects.join(' / ')||'なし'}`,
-      '- 対象操作: 読了切替・あとで読む・途中位置保存/再開・自動読了・次の未読・JSON書き出し/追加復元/置換復元・不正JSON拒否・画面反映',
+      '- 対象操作: トップ/シリーズ検索・読了/保存絞り込み・個別化入口・読了切替・あとで読む・途中位置保存/再開・自動読了・次の未読・JSON書き出し/追加復元/置換復元・不正JSON拒否・画面反映',
       '- Service Worker: 試験中は無効化し、現在配信中のHTML・JavaScriptを直接検証',
       `- テスト結果: ${fullResult.status}`,
       `- 成功: ${passed}`,
