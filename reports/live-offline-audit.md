@@ -1,6 +1,6 @@
 # 境界夜話 本番Service Worker・オフライン監査
 
-- 実行日時: 2026-07-23T04:01:57.106Z
+- 実行日時: 2026-07-23T04:02:28.419Z
 - 通常HTML確認: 49ページ
 - 404確認: 1ページ
 - オフライン関連資産: 4件
@@ -21,7 +21,7 @@
 
 | 対象 | HTTP | Content-Type | 応答 |
 |---|---:|---|---:|
-| service-worker.js | 200 | application/javascript; charset=utf-8 | 184ms |
-| offline.html | 200 | text/html; charset=utf-8 | 99ms |
-| data/sw-register.js | 200 | application/javascript; charset=utf-8 | 104ms |
-| manifest.webmanifest | 200 | application/manifest+json; charset=utf-8 | 97ms |
+| service-worker.js | 200 | application/javascript; charset=utf-8 | 185ms |
+| offline.html | 200 | text/html; charset=utf-8 | 65ms |
+| data/sw-register.js | 200 | application/javascript; charset=utf-8 | 21ms |
+| manifest.webmanifest | 200 | application/manifest+json; charset=utf-8 | 20ms |
