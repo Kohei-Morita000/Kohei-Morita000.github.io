@@ -38,6 +38,8 @@ on:
       - 'scripts/audit-reading-public-browser-workflow.mjs'
       - 'scripts/audit-site-health-workflow.mjs'
       - 'scripts/audit-accessibility-contrast-assets.mjs'
+      - 'scripts/public-audit-incident.mjs'
+      - 'scripts/test-public-audit-incident.mjs'
       - '.github/workflows/reading-public-browser-audit.yml'
   workflow_dispatch:
 
@@ -47,6 +49,7 @@ concurrency:
 
 permissions:
   contents: write
+  issues: write
 
 jobs:
   public-browser-audit:
@@ -65,6 +68,8 @@ jobs:
           node-version: '20'
       - name: Audit public browser schedule and safeguards
         run: node scripts/audit-reading-public-browser-workflow.mjs
+      - name: Test public audit incident issue lifecycle
+        run: node scripts/test-public-audit-incident.mjs
       - name: Audit accessibility and runtime safeguards
         run: node scripts/audit-site-health-workflow.mjs
       - name: Audit shared contrast stylesheet references
@@ -93,6 +98,7 @@ jobs:
           name: public-reading-and-site-health-audit
           path: |
             reports/reading-public-browser-workflow-audit.md
+            reports/public-audit-incident-audit.md
             reports/reading-public-browser-audit.md
             reports/site-health-workflow-audit.md
             reports/site-public-health-audit.md
@@ -101,12 +107,33 @@ jobs:
             test-results
           if-no-files-found: warn
           retention-days: 14
+      - name: Open or resolve public site incident
+        if: always()
+        continue-on-error: true
+        uses: actions/github-script@v7
+        env:
+          AUDIT_FAILED: ${{ steps.tests.outcome != 'success' || steps.health.outcome != 'success' }}
+          READING_OUTCOME: ${{ steps.tests.outcome }}
+          HEALTH_OUTCOME: ${{ steps.health.outcome }}
+        with:
+          script: |
+            const { pathToFileURL } = require('node:url');
+            const moduleUrl = pathToFileURL('${{ github.workspace }}/scripts/public-audit-incident.mjs').href;
+            const { managePublicAuditIncident } = await import(moduleUrl);
+            const result = await managePublicAuditIncident({
+              github,
+              context,
+              failed: process.env.AUDIT_FAILED === 'true',
+              readingOutcome: process.env.READING_OUTCOME || 'skipped',
+              healthOutcome: process.env.HEALTH_OUTCOME || 'skipped',
+            });
+            core.info(`Public audit incident action: ${result.action}${result.issueNumber ? ` #${result.issueNumber}` : ''}`);
       - name: Commit public browser audit reports
         if: always()
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add reports/reading-public-browser-workflow-audit.md reports/reading-public-browser-audit.md reports/site-health-workflow-audit.md reports/accessibility-contrast-assets-audit.md
+          git add reports/reading-public-browser-workflow-audit.md reports/public-audit-incident-audit.md reports/reading-public-browser-audit.md reports/site-health-workflow-audit.md reports/accessibility-contrast-assets-audit.md
           if [ -f reports/site-public-health-audit.md ]; then git add reports/site-public-health-audit.md; fi
           if git diff --cached --quiet; then
             echo "Public browser audit reports are unchanged."
