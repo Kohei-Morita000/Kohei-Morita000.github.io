@@ -1,0 +1,61 @@
+{
+  "schema": "kyokai-public-audit-performance-v1",
+  "generatedAt": "2026-07-23T00:48:53.349Z",
+  "periodStart": "2026-07-16T00:48:53.349Z",
+  "periodEnd": "2026-07-23T00:48:53.349Z",
+  "periodDays": 7,
+  "thresholds": {
+    "durationRatio": 1.5,
+    "retryRate": 0.25
+  },
+  "totals": {
+    "runs": 14,
+    "retryRuns": 3,
+    "retries": 9,
+    "retryRate": 0.2143,
+    "retryDegraded": false
+  },
+  "sources": [
+    {
+      "key": "reading",
+      "label": "読書機能",
+      "runs": 8,
+      "latestTimestamp": "2026-07-22T23:29:26.410Z",
+      "latestCommit": "fbf9837a456dc42eb7923d7e0dbdb65b9f81b113",
+      "latestDuration": 28.7,
+      "medianDuration": 30.15,
+      "durationRatio": 0.9519,
+      "durationDegraded": false,
+      "retryRuns": 0,
+      "retryRate": 0
+    },
+    {
+      "key": "health",
+      "label": "アクセシビリティ・実行時品質",
+      "runs": 4,
+      "latestTimestamp": "2026-07-22T23:30:21.253Z",
+      "latestCommit": "fbf9837a456dc42eb7923d7e0dbdb65b9f81b113",
+      "latestDuration": 53.7,
+      "medianDuration": 55.65,
+      "durationRatio": 0.965,
+      "durationDegraded": false,
+      "retryRuns": 2,
+      "retryRate": 0.5
+    },
+    {
+      "key": "offline",
+      "label": "オフライン・PWA",
+      "runs": 2,
+      "latestTimestamp": "2026-07-22T23:40:19.472Z",
+      "latestCommit": "a416b4f67d1c6784775e262b0d19a09c28f45560",
+      "latestDuration": 24.4,
+      "medianDuration": 32.9,
+      "durationRatio": 0.7416,
+      "durationDegraded": false,
+      "retryRuns": 1,
+      "retryRate": 0.5
+    }
+  ],
+  "breached": false,
+  "reasons": []
+}
