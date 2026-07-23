@@ -16,6 +16,7 @@ concurrency:
 
 permissions:
   contents: write
+  issues: write
 
 jobs:
   weekly-summary:
@@ -31,8 +32,91 @@ jobs:
           node-version: '20'
       - name: Build seven-day public audit summary
         run: node scripts/build-public-audit-weekly-summary.mjs
-      - name: Audit weekly summary and workflow safeguards
+      - name: Audit weekly summary and performance safeguards
         run: node scripts/audit-public-audit-weekly-summary.mjs
+      - name: Open update or close the weekly performance incident
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs=require('node:fs');
+            const performance=JSON.parse(fs.readFileSync('reports/public-audit-weekly-performance.json','utf8'));
+            const owner=context.repo.owner;
+            const repo=context.repo.repo;
+            const title='[監視] 境界夜話 公開監査 性能劣化';
+            const label='site-monitoring';
+            const marker='<!-- kyokai-weekly-performance-incident -->';
+            const jst=new Date().toLocaleString('ja-JP',{timeZone:'Asia/Tokyo',hour12:false});
+            const runUrl=`${context.serverUrl}/${owner}/${repo}/actions/runs/${context.runId}`;
+            const runLink=`[週次集計 Actions #${context.runNumber}](${runUrl})`;
+            const durationThreshold=`${performance.thresholds.durationRatio.toFixed(2)}倍`;
+            const retryThreshold=`${(performance.thresholds.retryRate*100).toFixed(1)}%`;
+            const retryRate=`${(performance.totals.retryRate*100).toFixed(1)}%`;
+            const sourceLines=performance.sources.map(source=>{
+              const ratio=source.durationRatio?`${source.durationRatio.toFixed(2)}倍`:'—';
+              const retry=`${(source.retryRate*100).toFixed(1)}%`;
+              return `- ${source.label}: 7日中央値 ${source.medianDuration.toFixed(1)}秒 / 最新 ${source.latestDuration.toFixed(1)}秒 / 中央値比 ${ratio} / 監査別再試行率 ${retry}`;
+            });
+
+            const issues=await github.paginate(github.rest.issues.listForRepo,{owner,repo,state:'open',per_page:100});
+            const incident=issues.find(issue=>!issue.pull_request&&issue.title===title&&issue.body?.includes(marker));
+
+            const details=[
+              marker,
+              performance.breached?'公開監査の週次性能基準を超過しました。':'公開監査の週次性能基準は正常です。',
+              '',
+              `- 所要時間基準: 最新が7日中央値の${durationThreshold}以上`,
+              `- 再試行率基準: 全監査の実行中${retryThreshold}以上`,
+              `- 現在の全体再試行率: ${retryRate}（${performance.totals.retryRuns}/${performance.totals.runs}実行）`,
+              `- 集計期間: ${performance.periodStart} 〜 ${performance.periodEnd}`,
+              `- 実行: ${runLink}`,
+              `- 確認時刻: ${jst} JST`,
+              '',
+              '### 監査別所要時間',
+              '',
+              ...sourceLines,
+              '',
+              '### 判定理由',
+              '',
+              ...(performance.reasons.length?performance.reasons.map(reason=>`- ${reason}`):['- 基準超過なし']),
+            ].join('\n');
+
+            if(performance.breached){
+              try{
+                await github.rest.issues.getLabel({owner,repo,name:label});
+              }catch(error){
+                if(error.status!==404)throw error;
+                await github.rest.issues.createLabel({owner,repo,name:label,color:'d73a4a',description:'公開サイトの自動監査で検出した障害'});
+              }
+              if(incident){
+                await github.rest.issues.createComment({
+                  owner,
+                  repo,
+                  issue_number:incident.number,
+                  body:`性能劣化基準を継続して超過しています。\n\n${details}`,
+                });
+                core.notice(`既存の性能劣化Issue #${incident.number}へ追記しました。`);
+              }else{
+                const created=await github.rest.issues.create({owner,repo,title,body:details,labels:[label]});
+                core.notice(`性能劣化Issue #${created.data.number}を作成しました。`);
+              }
+            }else if(incident){
+              await github.rest.issues.createComment({
+                owner,
+                repo,
+                issue_number:incident.number,
+                body:[
+                  '公開監査の週次性能基準が正常範囲へ戻りました。',
+                  '',
+                  details,
+                  '',
+                  'このIssueを自動でクローズします。',
+                ].join('\n'),
+              });
+              await github.rest.issues.update({owner,repo,issue_number:incident.number,state:'closed'});
+              core.notice(`性能劣化Issue #${incident.number}を復旧としてクローズしました。`);
+            }else{
+              core.info('週次性能基準は正常です。未解決の性能劣化Issueはありません。');
+            }
       - name: Upload weekly summary and configuration audit
         if: always()
         uses: actions/upload-artifact@v4
@@ -41,6 +125,7 @@ jobs:
           path: |
             reports/public-audit-weekly-summary.md
             reports/public-audit-weekly-summary-workflow-audit.md
+            reports/public-audit-weekly-performance.json
           if-no-files-found: error
           retention-days: 28
       - name: Commit weekly summary reports
@@ -48,7 +133,7 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add reports/public-audit-weekly-summary.md reports/public-audit-weekly-summary-workflow-audit.md
+          git add reports/public-audit-weekly-summary.md reports/public-audit-weekly-summary-workflow-audit.md reports/public-audit-weekly-performance.json
           if git diff --cached --quiet; then
             echo "Weekly public audit summary is unchanged."
           else
