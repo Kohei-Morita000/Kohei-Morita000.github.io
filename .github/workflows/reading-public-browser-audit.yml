@@ -23,6 +23,7 @@ on:
       - 'data/reading-log.css'
       - 'data/reading-log.js'
       - 'data/series-work-cards.css'
+      - 'data/works.js'
       - 'tests/reading-backup.spec.mjs'
       - 'tests/reading-state.spec.mjs'
       - 'tests/reading-discovery.spec.mjs'
@@ -50,7 +51,7 @@ jobs:
   public-browser-audit:
     if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 30
     env:
       PLAYWRIGHT_BASE_URL: https://allsunday1122.github.io/kyokai-yawa/
       READING_BROWSER_REPORT: reading-public-browser-audit.md
@@ -78,7 +79,7 @@ jobs:
         id: tests
         continue-on-error: true
         run: npx playwright test tests/reading-backup.spec.mjs tests/reading-state.spec.mjs tests/reading-discovery.spec.mjs tests/reading-log-management.spec.mjs --retries=2
-      - name: Audit accessibility runtime errors and failed requests
+      - name: Audit all public pages for accessibility runtime errors and failed requests
         id: health
         continue-on-error: true
         env:
