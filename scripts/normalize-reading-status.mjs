@@ -13,7 +13,7 @@ const scriptBlock='<!-- READING_STATUS_SCRIPT_START -->\n<script src="/kyokai-ya
 const stylePattern=/\s*<!-- READING_STATUS_STYLES_START -->[\s\S]*?<!-- READING_STATUS_STYLES_END -->\s*/g;
 const scriptPattern=/\s*<!-- READING_STATUS_SCRIPT_START -->[\s\S]*?<!-- READING_STATUS_SCRIPT_END -->\s*/g;
 
-const normalize=(filePath,{storyId='',beforeScript=''})=>{
+const normalize=(filePath,{storyId='',beforeScripts=[]})=>{
   const original=fs.readFileSync(filePath,'utf8');
   let html=original.replace(stylePattern,'\n').replace(scriptPattern,'\n');
   if(storyId){
@@ -22,7 +22,8 @@ const normalize=(filePath,{storyId='',beforeScript=''})=>{
   }
   if(!html.includes('</head>'))throw new Error(`${filePath}: </head>がありません`);
   html=html.replace('</head>',`${styleBlock}\n</head>`);
-  if(beforeScript&&html.includes(beforeScript))html=html.replace(beforeScript,`${scriptBlock}\n${beforeScript}`);
+  const insertionPoint=beforeScripts.find(marker=>marker&&html.includes(marker));
+  if(insertionPoint)html=html.replace(insertionPoint,`${scriptBlock}\n${insertionPoint}`);
   else if(html.includes('<!-- SW_REGISTER_START -->'))html=html.replace('<!-- SW_REGISTER_START -->',`${scriptBlock}\n<!-- SW_REGISTER_START -->`);
   else if(html.includes('</body>'))html=html.replace('</body>',`${scriptBlock}\n</body>`);
   else throw new Error(`${filePath}: 読了管理JavaScriptを挿入できません`);
@@ -31,8 +32,8 @@ const normalize=(filePath,{storyId='',beforeScript=''})=>{
 };
 
 let changed=0;
-changed+=normalize(path.join(root,'index.html'),{beforeScript:'<script src="/kyokai-yawa/data/archive-tools.js"></script>'})?1:0;
-for(const file of seriesFiles)changed+=normalize(path.join(root,'series',file),{beforeScript:'<script src="/kyokai-yawa/data/series-archive-tools.js" defer></script>'})?1:0;
-for(const work of works)changed+=normalize(path.join(root,'stories',work.file),{storyId:work.id,beforeScript:'<!-- READER_SCRIPT_START -->'})?1:0;
+changed+=normalize(path.join(root,'index.html'),{beforeScripts:['<!-- SAVED_STORIES_SCRIPT_START -->','<!-- HOME_PERSONALIZATION_SCRIPT_START -->','<script src="/kyokai-yawa/data/archive-tools.js"></script>']})?1:0;
+for(const file of seriesFiles)changed+=normalize(path.join(root,'series',file),{beforeScripts:['<!-- SAVED_STORIES_SCRIPT_START -->','<script src="/kyokai-yawa/data/series-archive-tools.js" defer></script>']})?1:0;
+for(const work of works)changed+=normalize(path.join(root,'stories',work.file),{storyId:work.id,beforeScripts:['<!-- SAVED_STORIES_SCRIPT_START -->','<!-- READER_SCRIPT_START -->']})?1:0;
 
-console.log(`# 読了済み管理正規化\n\n- 対象ページ: ${1+seriesFiles.length+works.length}\n- 作品ページID: ${works.length}\n- 更新ページ: ${changed}\n- 保存先: ブラウザー端末内localStorage\n`);
+console.log(`# 読了済み管理正規化\n\n- 対象ページ: ${1+seriesFiles.length+works.length}\n- 作品ページID: ${works.length}\n- 更新ページ: ${changed}\n- 読み込み順: 読了管理 → 保存管理 → 個別化/読書操作\n- 保存先: ブラウザー端末内localStorage\n`);
