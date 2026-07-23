@@ -50,7 +50,7 @@ jobs:
       - name: Run real-browser reading interaction tests
         id: tests
         continue-on-error: true
-        run: npm run test:e2e
+        run: npx playwright test tests/reading-backup.spec.mjs tests/reading-state.spec.mjs tests/reading-discovery.spec.mjs
       - name: Upload browser report traces screenshots and videos
         if: always()
         uses: actions/upload-artifact@v4
