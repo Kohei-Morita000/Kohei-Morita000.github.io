@@ -7,6 +7,8 @@ on:
     paths:
       - 'scripts/build-public-audit-weekly-summary.mjs'
       - 'scripts/audit-public-audit-weekly-summary.mjs'
+      - 'scripts/build-public-audit-performance-diagnostics.mjs'
+      - 'scripts/audit-public-audit-performance-diagnostics.mjs'
       - '.github/workflows/public-audit-weekly-summary.yml'
   workflow_dispatch:
 
@@ -32,14 +34,21 @@ jobs:
           node-version: '20'
       - name: Build seven-day public audit summary
         run: node scripts/build-public-audit-weekly-summary.mjs
+      - name: Build performance incident change diagnostics
+        run: node scripts/build-public-audit-performance-diagnostics.mjs
+      - name: Exercise the change diagnostic breach path
+        run: node scripts/build-public-audit-performance-diagnostics.mjs --self-test > /tmp/public-audit-diagnostics-self-test.json
       - name: Audit weekly summary and performance safeguards
         run: node scripts/audit-public-audit-weekly-summary.mjs
+      - name: Audit performance incident change diagnostics
+        run: node scripts/audit-public-audit-performance-diagnostics.mjs
       - name: Open update or close the weekly performance incident
         uses: actions/github-script@v7
         with:
           script: |
             const fs=require('node:fs');
             const performance=JSON.parse(fs.readFileSync('reports/public-audit-weekly-performance.json','utf8'));
+            const diagnostics=JSON.parse(fs.readFileSync('reports/public-audit-performance-diagnostics.json','utf8'));
             const owner=context.repo.owner;
             const repo=context.repo.repo;
             const title='[監視] 境界夜話 公開監査 性能劣化';
@@ -56,6 +65,34 @@ jobs:
               const retry=`${(source.retryRate*100).toFixed(1)}%`;
               return `- ${source.label}: 7日中央値 ${source.medianDuration.toFixed(1)}秒 / 最新 ${source.latestDuration.toFixed(1)}秒 / 中央値比 ${ratio} / 監査別再試行率 ${retry}`;
             });
+            const changeSections=diagnostics.windows.length?diagnostics.windows.flatMap(window=>{
+              const baseLink=`[${window.baseCommit.slice(0,8)}](${context.serverUrl}/${owner}/${repo}/commit/${window.baseCommit})`;
+              const headLink=`[${window.headCommit.slice(0,8)}](${context.serverUrl}/${owner}/${repo}/commit/${window.headCommit})`;
+              const commitLines=window.commits.length?window.commits.map(commit=>`- [${commit.sha.slice(0,8)}](${context.serverUrl}/${owner}/${repo}/commit/${commit.sha}) ${commit.subject} — ${commit.author}`):['- 比較区間内のコミットなし'];
+              const fileLines=window.files.length?window.files.map(item=>`- \`${item.status} ${item.file}\`${item.monitoring?'（監視・レポート系）':'（サイト・テスト本体）'}`):['- 変更ファイルなし'];
+              return [
+                `### 推定変更範囲: ${window.label}`,
+                '',
+                `- 比較: ${baseLink} → ${headLink}`,
+                `- 監査時刻: ${window.baseTimestamp||'不明'} → ${window.headTimestamp||'不明'}`,
+                `- 関連コミット: ${window.commitCount}件${window.commitsTruncated?'（最新20件を表示）':''}`,
+                `- 変更ファイル: ${window.fileCount}件（サイト・テスト本体 ${window.siteFileCount}件 / 監視・レポート系 ${window.monitoringFileCount}件）${window.filesTruncated?'（先頭40件を表示）':''}`,
+                '',
+                '#### 関連コミット',
+                '',
+                ...commitLines,
+                '',
+                '#### 変更ファイル',
+                '',
+                ...fileLines,
+                '',
+              ];
+            }):[
+              '### 推定変更範囲',
+              '',
+              '- 現在は性能基準内のため、基準超過区間の差分は生成していません。',
+              '',
+            ];
 
             const issues=await github.paginate(github.rest.issues.listForRepo,{owner,repo,state:'open',per_page:100});
             const incident=issues.find(issue=>!issue.pull_request&&issue.title===title&&issue.body?.includes(marker));
@@ -78,6 +115,8 @@ jobs:
               '### 判定理由',
               '',
               ...(performance.reasons.length?performance.reasons.map(reason=>`- ${reason}`):['- 基準超過なし']),
+              '',
+              ...changeSections,
             ].join('\n');
 
             if(performance.breached){
@@ -126,6 +165,8 @@ jobs:
             reports/public-audit-weekly-summary.md
             reports/public-audit-weekly-summary-workflow-audit.md
             reports/public-audit-weekly-performance.json
+            reports/public-audit-performance-diagnostics.json
+            reports/public-audit-performance-diagnostics-audit.md
           if-no-files-found: error
           retention-days: 28
       - name: Commit weekly summary reports
@@ -133,7 +174,7 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add reports/public-audit-weekly-summary.md reports/public-audit-weekly-summary-workflow-audit.md reports/public-audit-weekly-performance.json
+          git add reports/public-audit-weekly-summary.md reports/public-audit-weekly-summary-workflow-audit.md reports/public-audit-weekly-performance.json reports/public-audit-performance-diagnostics.json reports/public-audit-performance-diagnostics-audit.md
           if git diff --cached --quiet; then
             echo "Weekly public audit summary is unchanged."
           else
